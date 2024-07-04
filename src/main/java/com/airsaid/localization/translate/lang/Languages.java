@@ -143,6 +143,7 @@ public class Languages {
   public static final Lang TIGRINYA = new Lang(115, "ti", "ትግርኛ", "Tigrinya");
   public static final Lang TONGAN = new Lang(116, "to", "lea fakatonga", "Tongan");
   public static final Lang YUCATEC_MAYA = new Lang(117, "yua", "Yucatec Maya", "Yucatec Maya");
+  public static final Lang SORANI_KURDISH = new Lang(118, "ckb", "کوردیی ناوەندی", "Sorani Kurdish");
 
   private static final Map<Integer, Lang> sLanguages;
 
@@ -266,6 +267,7 @@ public class Languages {
     sLanguages.put(115, TIGRINYA);
     sLanguages.put(116, TONGAN);
     sLanguages.put(117, YUCATEC_MAYA);
+    sLanguages.put(118, SORANI_KURDISH);
   }
 
   public static List<Lang> getLanguages() {

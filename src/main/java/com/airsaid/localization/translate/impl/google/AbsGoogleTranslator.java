@@ -44,7 +44,7 @@ public abstract class AbsGoogleTranslator extends AbstractTranslator {
   public List<Lang> getSupportedLanguages() {
     if (supportedLanguages == null) {
       List<Lang> languages = Languages.getLanguages();
-      supportedLanguages = new ArrayList<>(104);
+      supportedLanguages = new ArrayList<>(105);
       for (int i = 1; i <= 104; i++) {
         Lang lang = languages.get(i);
         if (lang.equals(Languages.CHINESE_SIMPLIFIED)) {
@@ -60,6 +60,7 @@ public abstract class AbsGoogleTranslator extends AbstractTranslator {
         }
         supportedLanguages.add(lang);
       }
+      supportedLanguages.add(Languages.SORANI_KURDISH);
     }
     return supportedLanguages;
   }

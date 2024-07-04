@@ -71,7 +71,8 @@ public class AliTranslator extends AbstractTranslator {
       final List<Lang> languages = Languages.getLanguages();
       for (int i = 1; i < languages.size(); i++) {
         Lang lang = languages.get(i);
-        if (lang.equals(Languages.UKRAINIAN) || lang.equals(Languages.DARI)) {
+        if (lang.equals(Languages.UKRAINIAN) || lang.equals(Languages.DARI)
+            || lang.equals(Languages.SORANI_KURDISH)) {
           continue;
         }
         if (lang.equals(Languages.CHINESE_SIMPLIFIED)) {
