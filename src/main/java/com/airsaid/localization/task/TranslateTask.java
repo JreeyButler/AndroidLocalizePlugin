@@ -149,7 +149,7 @@ public class TranslateTask extends Task.Backgroundable {
       if (value instanceof XmlTag) {
         XmlTag xmlTag = (XmlTag) value;
         if (!mValueService.isTranslatable(xmlTag)) {
-          translatedValues.add(value);
+          // translatedValues.add(value);
           continue;
         }
 
