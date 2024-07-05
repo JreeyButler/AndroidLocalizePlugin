@@ -116,6 +116,7 @@ public final class TranslatorService {
     if (StringUtils.isNumeric(text)) {
       return text;
     }
+    text = getValidContent(text);
 
     String result = selectedTranslator.doTranslate(fromLang, toLang, text);
     LOG.info(String.format("doTranslate result: %s", result));
@@ -126,6 +127,27 @@ public final class TranslatorService {
     cacheService.put(getCacheKey(fromLang, toLang, text), result);
     delay(intervalTime);
     return result;
+  }
+
+  /**
+   * Remove double quotes from the beginning and end of text sentences
+   *
+   * @param text source text
+   * @return valid text
+   */
+  private String getValidContent(String text) {
+    if (text == null || "".equals(text)) {
+      return text;
+    }
+    final int index = text.indexOf("\"");
+    if (index == 0) {
+      text = text.substring(1, text.length());
+    }
+    final int lastIndex = text.lastIndexOf("\"");
+    if (lastIndex == text.length() - 1) {
+      text = text.substring(0, lastIndex);
+    }
+    return text;
   }
 
   public void setEnableCache(boolean isEnableCache) {
