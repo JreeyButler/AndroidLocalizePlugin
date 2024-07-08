@@ -150,10 +150,11 @@ public final class AndroidValuesService {
     if (parent == null) return false;
 
     String parentName = parent.getName();
-    if (!"values".equals(parentName)) return false;
-
-    String fileName = file.getName();
-    return STRINGS_FILE_NAME_PATTERN.matcher(fileName).matches();
+    if ("values".equals(parentName) || "values-zh-rCN".equals(parentName)) {
+      String fileName = file.getName();
+      return STRINGS_FILE_NAME_PATTERN.matcher(fileName).matches();
+    }
+    return false;
   }
 
   /**
