@@ -143,9 +143,13 @@ public class TranslateTask extends Task.Backgroundable {
     LOG.info("doTranslate toLanguage: " + toLanguage.getEnglishName() + ", toValues: " + toValues + ", isOverwrite: " + isOverwrite);
 
     List<PsiElement> translatedValues = new ArrayList<>();
+    final int totalSize = mValues == null ? 0 : mValues.size();
+    int count = 0;
     for (PsiElement value : mValues) {
       if (progressIndicator.isCanceled()) break;
-
+      String progressText = "(" + (++count) + "/" + totalSize + ")";
+      progressIndicator
+          .setText("Translation to " + toLanguage.getEnglishName() + progressText+ "...");
       if (value instanceof XmlTag) {
         XmlTag xmlTag = (XmlTag) value;
         if (!mValueService.isTranslatable(xmlTag)) {
