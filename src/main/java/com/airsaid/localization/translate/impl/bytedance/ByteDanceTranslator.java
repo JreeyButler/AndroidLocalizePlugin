@@ -2,6 +2,10 @@ package com.airsaid.localization.translate.impl.bytedance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.Icon;
 
@@ -29,7 +33,7 @@ import com.volcengine.model.response.ResponseMetadata.Error;
 
 import icons.PluginIcons;
 
-import java.util.Arrays;
+
 
 @AutoService(AbstractTranslator.class)
 public class ByteDanceTranslator extends AbstractTranslator {
@@ -37,6 +41,21 @@ public class ByteDanceTranslator extends AbstractTranslator {
     private static final String KEY = "ByteDance";
 
     private static final String APPLY_APP_ID_URL = "https://www.volcengine.com/docs/4640/130872";
+    private static final String[] SOURCE_SUPPORT_LANG_CODE_ARRAY={
+        "zh","zh-Hant","zh-Hant-hk","zh-Hant-tw","tn","vi","iu","it",
+        "id","hi","en","ho","he","es","el","uk","ur","tk","tr","ti",
+        "ty","tl","to","th","ta","te","sl","sk","ss","eo","sm","sg",
+        "st","sv","ja","tw","qu","pt","pa","no","nb","nr","my","bn",
+        "mn","mh","mk","ml","mr","ms","lu","ro","lt","lv","lo","kj",
+        "hr","kn","ki","cs","ca","nl","ko","ht","gu","ka","kl","km",
+        "lg","kg","fi","fj","fr","ru","ng","de","tt","da","ts","cv",
+        "fa","bs","pl","bi","nd","ba","bg","az","ar","af","sq","ab",
+        "os","ee","et","ay","lzh","am","ckb","cy","gl","ha","hy","ig",
+        "kmr","ln","nso","ny","om","sn","so","sr","sw","xh","yo","zu",
+        "bo","nan","wuu","yue","cmn","ug","fuv","hu","kam","luo","rw",
+        "umb","wo"
+    };
+
     private List<Lang> supportedLanguages;
     private ITranslateService mService;
 
@@ -68,10 +87,36 @@ public class ByteDanceTranslator extends AbstractTranslator {
     @Override
     public @NotNull List<Lang> getSupportedLanguages() {
         if (supportedLanguages == null) {
-            supportedLanguages = new ArrayList<>();
-            supportedLanguages.add(Languages.SORANI_KURDISH);
+            Set<Lang> langSet = new HashSet<>();
+            List<Lang> allSuportedLangedList = Languages.getLanguages();
+            for (String code : SOURCE_SUPPORT_LANG_CODE_ARRAY) {
+                Lang lang = getLanguageByCode(code,allSuportedLangedList);
+                if (lang != null) {
+                    langSet.add(lang);
+                }
+            }
+            langSet.add(Languages.CHINESE_SIMPLIFIED.setTranslationCode("zh"));
+            langSet.add(Languages.CHINESE_TRADITIONAL.setTranslationCode("zh-Hant"));
+            langSet.add(Languages.INDONESIAN.setTranslationCode("id"));
+            langSet.add(Languages.HEBREW.setTranslationCode("he"));
+            supportedLanguages = new ArrayList<>(langSet);
         }
         return supportedLanguages;
+    }
+
+    private Lang getLanguageByCode(String code, List<Lang> list) {
+        if (code == null || "".equals(code)) {
+            return null;
+        }
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        for (Lang lang : list) {
+            if (lang.getCode().equals(code)) {
+                return lang;
+            }
+        }
+        return null;
     }
 
     @Override
