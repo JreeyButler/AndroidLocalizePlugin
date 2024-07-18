@@ -144,7 +144,7 @@ public final class TranslatorService {
       text = text.substring(1, text.length());
     }
     final int lastIndex = text.lastIndexOf("\"");
-    if (lastIndex == text.length() - 1) {
+    if (lastIndex != -1 && lastIndex == text.length() - 1) {
       text = text.substring(0, lastIndex);
     }
     return text;
