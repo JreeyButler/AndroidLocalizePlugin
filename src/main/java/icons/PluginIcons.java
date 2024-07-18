@@ -32,7 +32,7 @@ public interface PluginIcons {
   Icon ALI_ICON = load("/icons/icon_ali.svg");
   Icon DEEP_L_ICON = load("/icons/icon_deepl.svg");
   Icon OPENAI_ICON = load("/icons/icon_openai.svg");
-  Icon BYTEDANCE_ICON = TRANSLATE_ACTION_ICON;
+  Icon BYTEDANCE_ICON = load("/icons/icon_bytedance.svg");
 
   private static Icon load(String path) {
     return IconLoader.getIcon(path, PluginIcons.class);
