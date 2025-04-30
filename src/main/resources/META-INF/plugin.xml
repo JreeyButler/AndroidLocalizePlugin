@@ -23,4 +23,15 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="EditSource"/>
         </action>
     </actions>
+
+    <actions>
+        <action id="com.airsaid.localization.action.TranslatePartAction"
+                class="com.airsaid.localization.action.TranslatePartAction"
+                icon="PluginIcons.TRANSLATE_ACTION_ICON"
+                text="Translate to other languages"
+                description="Translate this part of the text resources into other languages" >
+            <add-to-group group-id="EditorPopupMenu" anchor="first" relative-to-action="EditSource" />
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl P"/>
+        </action>
+    </actions>
 </idea-plugin>

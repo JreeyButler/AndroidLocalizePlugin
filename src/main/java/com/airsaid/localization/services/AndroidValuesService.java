@@ -17,7 +17,23 @@
 
 package com.airsaid.localization.services;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.airsaid.localization.translate.lang.Lang;
+import com.airsaid.localization.utils.MyXmlPsiUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.ServiceManager;
@@ -35,15 +51,6 @@ import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.Consumer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Operation service for the android value files. eg: strings.xml (or any string resource from values directory).
@@ -56,6 +63,8 @@ public final class AndroidValuesService {
   private static final Logger LOG = Logger.getInstance(AndroidValuesService.class);
 
   private static final Pattern STRINGS_FILE_NAME_PATTERN = Pattern.compile(".+\\.xml");
+  private static final String RESOURCES_START_TAG = "<resources>";
+  private static final String RESOURCES_END_TAG = "</resources>";
 
   /**
    * Returns the {@link AndroidValuesService} object instance.
@@ -81,6 +90,28 @@ public final class AndroidValuesService {
     );
   }
 
+  public void loadValuesByAsync(String xmlContent, @NotNull Project project,
+      @NotNull Consumer<List<PsiElement>> consumer) {
+    ApplicationManager.getApplication().executeOnPooledThread(() -> {
+      List<PsiElement> values;
+      if (xmlContent == null || xmlContent.isEmpty()) {
+        values = new ArrayList<>();
+      } else {
+        StringBuilder sb = new StringBuilder();
+        sb.append(RESOURCES_START_TAG).append(System.lineSeparator())
+            .append("    ").append(xmlContent.trim()).append(System.lineSeparator())
+            .append(RESOURCES_END_TAG);
+        XmlFile xmlFile = MyXmlPsiUtil.createXmlFileFromString(project, sb.toString());
+        if (xmlFile == null) {
+          values = new ArrayList<>();
+        } else {
+          values = loadValues(xmlFile);
+        }
+      }
+      ApplicationManager.getApplication().invokeLater(() -> consumer.consume(values));
+    });
+  }
+
   /**
    * Loading the value file as the {@link PsiElement} collection.
    *
@@ -96,9 +127,21 @@ public final class AndroidValuesService {
     });
   }
 
+  public List<PsiElement> loadValues(@NotNull XmlFile valueFile){
+    return ApplicationManager.getApplication().runReadAction((Computable<List<PsiElement>>) () -> {
+      LOG.info("loadValues valueFile: " + valueFile.getName());
+      List<PsiElement> values = parseValuesXml(valueFile);
+      LOG.info("loadValues parsed " + valueFile.getName() + " result: " + values);
+      return values;
+    });
+  }
+
   private List<PsiElement> parseValuesXml(@NotNull PsiFile valueFile) {
+    return parseValuesXml((XmlFile) valueFile);
+  }
+
+  private List<PsiElement> parseValuesXml(@NotNull XmlFile xmlFile) {
     final List<PsiElement> values = new ArrayList<>();
-    final XmlFile xmlFile = (XmlFile) valueFile;
 
     final XmlDocument document = xmlFile.getDocument();
     if (document == null) return values;
@@ -118,13 +161,28 @@ public final class AndroidValuesService {
    * @param values    specified {@link PsiElement} collection data.
    * @param valueFile specified file.
    */
-  public void writeValueFile(@NotNull List<PsiElement> values, @NotNull File valueFile) {
+  public void writeValueFile(@NotNull List<PsiElement> values, @NotNull File valueFile, final boolean appendMode) {
     boolean isCreateSuccess = FileUtil.createIfDoesntExist(valueFile);
     if (!isCreateSuccess) {
       LOG.error("Failed to write to " + valueFile.getPath() + " file: create failed!");
       return;
     }
     ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
+      func: {
+        if (appendMode) {
+          long index = -1;
+          try {
+            index = findResourceIndex(valueFile, RESOURCES_END_TAG);
+            if (index < 0) {
+              break func;
+            }
+            appendWrite(valueFile, index, values);
+          } catch(IOException e) {
+            e.printStackTrace();
+          }
+          return;
+        }
+      }
       try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(valueFile, false), StandardCharsets.UTF_8))) {
         for (PsiElement value : values) {
           bw.write(value.getText());
@@ -135,6 +193,86 @@ public final class AndroidValuesService {
         LOG.error("Failed to write to " + valueFile.getPath() + " file.", e);
       }
     }));
+  }
+
+  private void appendWrite(@NotNull File valueFile, long index, @NotNull List<PsiElement> values) throws IOException {
+    if (index < 0) {
+      return;
+    }
+    final long fileLength = valueFile.length();
+    if (index > fileLength) {
+      return;
+    }
+    if (!valueFile.exists()) {
+      return;
+    }
+    try (RandomAccessFile raf = new RandomAccessFile(valueFile, "rw")) {
+      raf.seek(index);
+      StringBuilder sb = new StringBuilder();
+      boolean verified = false;
+      for (int i = 0; i < values.size(); i++) {
+        final String text = values.get(i).getText();
+        if (i < 3) {
+          sb.append(text);
+          continue;
+        } else {
+          if (!verified && !sb.toString().trim().equals(RESOURCES_START_TAG)) {
+            raf.write(sb.toString().getBytes(StandardCharsets.UTF_8));
+            verified = true;
+          } else {
+            // no write <resource> tag
+            verified = true;
+          }
+        }
+        raf.write(text.getBytes(StandardCharsets.UTF_8));
+      }
+    }
+  }
+
+  private long findResourceIndex(File file, String target) throws IOException {
+    byte[] targetBytes = target.getBytes(StandardCharsets.UTF_8);
+    int targetLen = targetBytes.length;
+
+    try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+        long fileLength = raf.length();
+        LOG.info("fileLength = " + fileLength);
+        int bufferSize = 4096;
+        // 多留 targetLen 防止跨段
+        byte[] buffer = new byte[bufferSize + targetLen];
+        long pointer = fileLength;
+
+        while (pointer > 0) {
+            int readSize = (int) Math.min(bufferSize, pointer);
+            pointer -= readSize;
+            raf.seek(pointer);
+            raf.readFully(buffer, 0, readSize);
+
+            // 向前拼接前一段的数据以防止匹配跨段
+            if (readSize < bufferSize) {
+                System.arraycopy(buffer, 0, buffer, targetLen, readSize);
+            } else {
+                raf.seek(pointer - targetLen);
+                raf.readFully(buffer, 0, targetLen + readSize);
+            }
+
+            // 从后往前匹配
+            for (int i = buffer.length - targetLen; i >= 0; i--) {
+                boolean match = true;
+                for (int j = 0; j < targetLen; j++) {
+                    if (buffer[i + j] != targetBytes[j]) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                  long index = pointer + i;
+                  index -= targetLen;
+                  return index;
+                }
+            }
+        }
+    }
+    return -1;
   }
 
   /**

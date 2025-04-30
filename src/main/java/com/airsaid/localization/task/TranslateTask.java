@@ -68,6 +68,7 @@ public class TranslateTask extends Task.Backgroundable {
 
   private OnTranslateListener mOnTranslateListener;
   private TranslationException mTranslationError;
+  private boolean appendMode = false;
 
   public interface OnTranslateListener {
     void onTranslateSuccess();
@@ -83,6 +84,10 @@ public class TranslateTask extends Task.Backgroundable {
     mValueFile = valueFile.getVirtualFile();
     mTranslatorService = TranslatorService.getInstance();
     mValueService = AndroidValuesService.getInstance();
+  }
+
+  public void setAppendMode(boolean appendMode){
+    this.appendMode = appendMode;
   }
 
   /**
@@ -227,7 +232,7 @@ public class TranslateTask extends Task.Backgroundable {
     if (progressIndicator.isCanceled() || translatedValues.isEmpty()) return;
 
     progressIndicator.setText("Writing to " + valueFile.getParentFile().getName() + " data...");
-    mValueService.writeValueFile(translatedValues, valueFile);
+    mValueService.writeValueFile(translatedValues, valueFile, appendMode);
 
     refreshAndOpenFile(valueFile);
   }
