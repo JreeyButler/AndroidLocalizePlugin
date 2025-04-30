@@ -17,7 +17,7 @@
     <actions>
         <action id="com.airsaid.localization.action.TranslateAction"
                 class="com.airsaid.localization.action.TranslateAction"
-                text="Translate to Other Languages"
+                text="Translate to other languages"
                 icon="PluginIcons.TRANSLATE_ACTION_ICON"
                 description="Translate strings to other languages.">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="EditSource"/>
