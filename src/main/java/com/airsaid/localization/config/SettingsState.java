@@ -34,116 +34,116 @@ import java.util.Map;
  * @author airsaid
  */
 @State(
-    name = "com.airsaid.localization.config.SettingsState",
-    storages = {@Storage("androidLocalizeSettings.xml")}
+        name = "com.airsaid.localization.config.SettingsState",
+        storages = {@Storage("androidLocalizeSettings.xml")}
 )
 @Service
 public final class SettingsState implements PersistentStateComponent<SettingsState.State> {
 
-  private static final Logger LOG = Logger.getInstance(SettingsState.class);
+    private static final Logger LOG = Logger.getInstance(SettingsState.class);
 
-  private final Map<String, SecureStorage> appKeyStorage;
+    private final Map<String, SecureStorage> appKeyStorage;
 
-  private State state = new State();
+    private State state = new State();
 
-  public SettingsState() {
-    appKeyStorage = new HashMap<>();
-    TranslatorService translatorService = TranslatorService.getInstance();
-    Collection<AbstractTranslator> translators = translatorService.getTranslators().values();
-    for (AbstractTranslator translator : translators) {
-      if (translatorService.getDefaultTranslator() != translator) {
-        appKeyStorage.put(translator.getKey(), new SecureStorage(translator.getKey()));
-      }
+    public SettingsState() {
+        appKeyStorage = new HashMap<>();
+        TranslatorService translatorService = TranslatorService.getInstance();
+        Collection<AbstractTranslator> translators = translatorService.getTranslators().values();
+        for (AbstractTranslator translator : translators) {
+            if (translatorService.getDefaultTranslator() != translator) {
+                appKeyStorage.put(translator.getKey(), new SecureStorage(translator.getKey()));
+            }
+        }
     }
-  }
 
-  public static SettingsState getInstance() {
-    return ServiceManager.getService(SettingsState.class);
-  }
-
-  public void initSetting() {
-    TranslatorService translatorService = TranslatorService.getInstance();
-    AbstractTranslator selectedTranslator = translatorService.getSelectedTranslator();
-    if (selectedTranslator == null) {
-      LOG.info("initSetting");
-      translatorService.setSelectedTranslator(getSelectedTranslator());
-      translatorService.setEnableCache(isEnableCache());
-      translatorService.setMaxCacheSize(getMaxCacheSize());
-      translatorService.setTranslationInterval(getTranslationInterval());
+    public static SettingsState getInstance() {
+        return ServiceManager.getService(SettingsState.class);
     }
-  }
 
-  public AbstractTranslator getSelectedTranslator() {
-    return StringUtil.isEmpty(state.selectedTranslatorKey) ? TranslatorService.getInstance().getDefaultTranslator() :
-        TranslatorService.getInstance().getTranslators().get(state.selectedTranslatorKey);
-  }
-
-  public void setSelectedTranslator(AbstractTranslator translator) {
-    this.state.selectedTranslatorKey = translator.getKey();
-  }
-
-  public void setAppId(@NotNull String translatorKey, @NotNull String appId) {
-    state.appIds.put(translatorKey, appId);
-  }
-
-  @NotNull
-  public String getAppId(String translatorKey) {
-    String appId = state.appIds.get(translatorKey);
-    return appId != null ? appId : "";
-  }
-
-  public void setAppKey(@NotNull String translatorKey, @NotNull String appKey) {
-    SecureStorage secureStorage = appKeyStorage.get(translatorKey);
-    if (secureStorage != null) {
-      secureStorage.save(appKey);
+    public void initSetting() {
+        TranslatorService translatorService = TranslatorService.getInstance();
+        AbstractTranslator selectedTranslator = translatorService.getSelectedTranslator();
+        if (selectedTranslator == null) {
+            LOG.info("initSetting");
+            translatorService.setSelectedTranslator(getSelectedTranslator());
+            translatorService.setEnableCache(isEnableCache());
+            translatorService.setMaxCacheSize(getMaxCacheSize());
+            translatorService.setTranslationInterval(getTranslationInterval());
+        }
     }
-  }
 
-  @NotNull
-  public String getAppKey(@NotNull String translatorKey) {
-    SecureStorage secureStorage = appKeyStorage.get(translatorKey);
-    return secureStorage != null ? secureStorage.read() : "";
-  }
+    public AbstractTranslator getSelectedTranslator() {
+        return StringUtil.isEmpty(state.selectedTranslatorKey) ? TranslatorService.getInstance().getDefaultTranslator() :
+                TranslatorService.getInstance().getTranslators().get(state.selectedTranslatorKey);
+    }
 
-  public boolean isEnableCache() {
-    return state.isEnableCache;
-  }
+    public void setSelectedTranslator(AbstractTranslator translator) {
+        this.state.selectedTranslatorKey = translator.getKey();
+    }
 
-  public void setEnableCache(boolean isEnable) {
-    state.isEnableCache = isEnable;
-  }
+    public void setAppId(@NotNull String translatorKey, @NotNull String appId) {
+        state.appIds.put(translatorKey, appId);
+    }
 
-  public int getMaxCacheSize() {
-    return state.maxCacheSize;
-  }
+    @NotNull
+    public String getAppId(String translatorKey) {
+        String appId = state.appIds.get(translatorKey);
+        return appId != null ? appId : "";
+    }
 
-  public void setMaxCacheSize(int maxCacheSize) {
-    state.maxCacheSize = maxCacheSize;
-  }
+    public void setAppKey(@NotNull String translatorKey, @NotNull String appKey) {
+        SecureStorage secureStorage = appKeyStorage.get(translatorKey);
+        if (secureStorage != null) {
+            secureStorage.save(appKey);
+        }
+    }
 
-  public int getTranslationInterval() {
-    return state.translationInterval;
-  }
+    @NotNull
+    public String getAppKey(@NotNull String translatorKey) {
+        SecureStorage secureStorage = appKeyStorage.get(translatorKey);
+        return secureStorage != null ? secureStorage.read() : "";
+    }
 
-  public void setTranslationInterval(int intervalTime) {
-    state.translationInterval = intervalTime;
-  }
+    public boolean isEnableCache() {
+        return state.isEnableCache;
+    }
 
-  @Override
-  public @Nullable SettingsState.State getState() {
-    return state;
-  }
+    public void setEnableCache(boolean isEnable) {
+        state.isEnableCache = isEnable;
+    }
 
-  @Override
-  public void loadState(@NotNull State state) {
-    this.state = state;
-  }
+    public int getMaxCacheSize() {
+        return state.maxCacheSize;
+    }
 
-  static class State {
-    public String selectedTranslatorKey;
-    public Map<String, String> appIds = new HashMap<>();
-    public boolean isEnableCache = true;
-    public int maxCacheSize = 500;
-    public int translationInterval = 2; // 2 second
-  }
+    public void setMaxCacheSize(int maxCacheSize) {
+        state.maxCacheSize = maxCacheSize;
+    }
+
+    public int getTranslationInterval() {
+        return state.translationInterval;
+    }
+
+    public void setTranslationInterval(int intervalTime) {
+        state.translationInterval = intervalTime;
+    }
+
+    @Override
+    public @Nullable SettingsState.State getState() {
+        return state;
+    }
+
+    @Override
+    public void loadState(@NotNull State state) {
+        this.state = state;
+    }
+
+    static class State {
+        public String selectedTranslatorKey;
+        public Map<String, String> appIds = new HashMap<>();
+        public boolean isEnableCache = true;
+        public int maxCacheSize = 500;
+        public int translationInterval = 2; // 2 second
+    }
 }

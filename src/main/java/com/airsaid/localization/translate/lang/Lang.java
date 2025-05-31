@@ -28,79 +28,79 @@ import java.util.Objects;
  * @author airsaid
  */
 public final class Lang implements Cloneable {
-  private final int id;
-  private final String code;
-  private final String name;
-  private final String englishName;
-  private String translationCode;
+    private final int id;
+    private final String code;
+    private final String name;
+    private final String englishName;
+    private String translationCode;
 
-  public Lang(int id, String code, String name, String englishName) {
-    this.id = id;
-    this.code = code;
-    this.name = name;
-    this.englishName = englishName;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getEnglishName() {
-    return englishName;
-  }
-
-  public Lang setTranslationCode(String translationCode) {
-    final Lang newLang = this.clone();
-    Objects.requireNonNull(newLang).translationCode = translationCode;
-    return newLang;
-  }
-
-  public String getTranslationCode() {
-    if (!StringUtil.isEmpty(translationCode)) {
-      return translationCode;
+    public Lang(int id, String code, String name, String englishName) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+        this.englishName = englishName;
     }
-    return code;
-  }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Lang language = (Lang) o;
-    return id == language.id;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
-
-  @Override
-  public Lang clone() {
-    try {
-      return (Lang) super.clone();
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
+    public int getId() {
+        return id;
     }
-    return null;
-  }
 
-  @Override
-  public String toString() {
-    return "Lang{" +
-        "id=" + id +
-        ", code='" + code + '\'' +
-        ", name='" + name + '\'' +
-        ", englishName='" + englishName + '\'' +
-        ", translationCode='" + translationCode + '\'' +
-        '}';
-  }
+    public String getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEnglishName() {
+        return englishName;
+    }
+
+    public String getTranslationCode() {
+        if (!StringUtil.isEmpty(translationCode)) {
+            return translationCode;
+        }
+        return code;
+    }
+
+    public Lang setTranslationCode(String translationCode) {
+        final Lang newLang = this.clone();
+        Objects.requireNonNull(newLang).translationCode = translationCode;
+        return newLang;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lang language = (Lang) o;
+        return id == language.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public Lang clone() {
+        try {
+            return (Lang) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return "Lang{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", englishName='" + englishName + '\'' +
+                ", translationCode='" + translationCode + '\'' +
+                '}';
+    }
 }

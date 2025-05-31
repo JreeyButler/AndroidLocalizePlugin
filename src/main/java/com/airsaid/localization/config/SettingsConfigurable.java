@@ -34,98 +34,98 @@ import java.util.Map;
  */
 public class SettingsConfigurable implements Configurable {
 
-  private static final Logger LOG = Logger.getInstance(SettingsConfigurable.class);
+    private static final Logger LOG = Logger.getInstance(SettingsConfigurable.class);
 
-  private SettingsComponent settingsComponent;
+    private SettingsComponent settingsComponent;
 
-  @Override
-  public String getDisplayName() {
-    return Constants.PLUGIN_NAME;
-  }
-
-  @Override
-  public JComponent getPreferredFocusedComponent() {
-    return settingsComponent.getPreferredFocusedComponent();
-  }
-
-  @Override
-  public @Nullable JComponent createComponent() {
-    settingsComponent = new SettingsComponent();
-    initComponents();
-    return settingsComponent.getContent();
-  }
-
-  private void initComponents() {
-    SettingsState settingsState = SettingsState.getInstance();
-    Map<String, AbstractTranslator> translators = TranslatorService.getInstance().getTranslators();
-    settingsComponent.setTranslators(translators);
-    settingsComponent.setSelectedTranslator(translators.get(settingsState.getSelectedTranslator().getKey()));
-    settingsComponent.setEnableCache(settingsState.isEnableCache());
-    settingsComponent.setMaxCacheSize(settingsState.getMaxCacheSize());
-    settingsComponent.setTranslationInterval(settingsState.getTranslationInterval());
-  }
-
-  @Override
-  public boolean isModified() {
-    SettingsState settingsState = SettingsState.getInstance();
-    AbstractTranslator selectedTranslator = settingsComponent.getSelectedTranslator();
-    boolean isChanged = settingsState.getSelectedTranslator() == selectedTranslator;
-    isChanged |= settingsState.getAppId(selectedTranslator.getKey()).equals(selectedTranslator.getAppId());
-    isChanged |= settingsState.getAppKey(selectedTranslator.getKey()).equals(selectedTranslator.getAppKey());
-    isChanged |= settingsState.isEnableCache() == settingsComponent.isEnableCache();
-    isChanged |= settingsState.getMaxCacheSize() == settingsComponent.getMaxCacheSize();
-    isChanged |= settingsState.getTranslationInterval() == settingsComponent.getTranslationInterval();
-    LOG.info("isModified: " + isChanged);
-    return isChanged;
-  }
-
-  @Override
-  public void apply() throws ConfigurationException {
-    SettingsState settingsState = SettingsState.getInstance();
-    AbstractTranslator selectedTranslator = settingsComponent.getSelectedTranslator();
-    LOG.info("apply selectedTranslator: " + selectedTranslator.getName());
-
-    // Verify that the required parameters are not configured
-    if (selectedTranslator.isNeedAppId() && StringUtil.isEmpty(settingsComponent.getAppId())) {
-      throw new ConfigurationException(selectedTranslator.getAppIdDisplay() + " not configured");
-    }
-    if (selectedTranslator.isNeedAppKey() && StringUtil.isEmpty(settingsComponent.getAppKey())) {
-      throw new ConfigurationException(selectedTranslator.getAppKeyDisplay() + " not configured");
+    @Override
+    public String getDisplayName() {
+        return Constants.PLUGIN_NAME;
     }
 
-    settingsState.setSelectedTranslator(selectedTranslator);
-    if (selectedTranslator.isNeedAppId()) {
-      settingsState.setAppId(selectedTranslator.getKey(), settingsComponent.getAppId());
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return settingsComponent.getPreferredFocusedComponent();
     }
-    if (selectedTranslator.isNeedAppKey()) {
-      settingsState.setAppKey(selectedTranslator.getKey(), settingsComponent.getAppKey());
+
+    @Override
+    public @Nullable JComponent createComponent() {
+        settingsComponent = new SettingsComponent();
+        initComponents();
+        return settingsComponent.getContent();
     }
-    settingsState.setEnableCache(settingsComponent.isEnableCache());
-    settingsState.setMaxCacheSize(settingsComponent.getMaxCacheSize());
-    settingsState.setTranslationInterval(settingsComponent.getTranslationInterval());
 
-    TranslatorService translatorService = TranslatorService.getInstance();
-    translatorService.setSelectedTranslator(selectedTranslator);
-    translatorService.setEnableCache(settingsComponent.isEnableCache());
-    translatorService.setMaxCacheSize(settingsComponent.getMaxCacheSize());
-    translatorService.setTranslationInterval(settingsComponent.getTranslationInterval());
-  }
+    private void initComponents() {
+        SettingsState settingsState = SettingsState.getInstance();
+        Map<String, AbstractTranslator> translators = TranslatorService.getInstance().getTranslators();
+        settingsComponent.setTranslators(translators);
+        settingsComponent.setSelectedTranslator(translators.get(settingsState.getSelectedTranslator().getKey()));
+        settingsComponent.setEnableCache(settingsState.isEnableCache());
+        settingsComponent.setMaxCacheSize(settingsState.getMaxCacheSize());
+        settingsComponent.setTranslationInterval(settingsState.getTranslationInterval());
+    }
 
-  @Override
-  public void reset() {
-    LOG.info("reset");
-    SettingsState settingsState = SettingsState.getInstance();
-    AbstractTranslator selectedTranslator = settingsState.getSelectedTranslator();
-    settingsComponent.setSelectedTranslator(selectedTranslator);
-    settingsComponent.setAppId(settingsState.getAppId(selectedTranslator.getKey()));
-    settingsComponent.setAppKey(settingsState.getAppKey(selectedTranslator.getKey()));
-    settingsComponent.setEnableCache(settingsState.isEnableCache());
-    settingsComponent.setMaxCacheSize(settingsState.getMaxCacheSize());
-    settingsComponent.setTranslationInterval(settingsState.getTranslationInterval());
-  }
+    @Override
+    public boolean isModified() {
+        SettingsState settingsState = SettingsState.getInstance();
+        AbstractTranslator selectedTranslator = settingsComponent.getSelectedTranslator();
+        boolean isChanged = settingsState.getSelectedTranslator() == selectedTranslator;
+        isChanged |= settingsState.getAppId(selectedTranslator.getKey()).equals(selectedTranslator.getAppId());
+        isChanged |= settingsState.getAppKey(selectedTranslator.getKey()).equals(selectedTranslator.getAppKey());
+        isChanged |= settingsState.isEnableCache() == settingsComponent.isEnableCache();
+        isChanged |= settingsState.getMaxCacheSize() == settingsComponent.getMaxCacheSize();
+        isChanged |= settingsState.getTranslationInterval() == settingsComponent.getTranslationInterval();
+        LOG.info("isModified: " + isChanged);
+        return isChanged;
+    }
 
-  @Override
-  public void disposeUIResources() {
-    settingsComponent = null;
-  }
+    @Override
+    public void apply() throws ConfigurationException {
+        SettingsState settingsState = SettingsState.getInstance();
+        AbstractTranslator selectedTranslator = settingsComponent.getSelectedTranslator();
+        LOG.info("apply selectedTranslator: " + selectedTranslator.getName());
+
+        // Verify that the required parameters are not configured
+        if (selectedTranslator.isNeedAppId() && StringUtil.isEmpty(settingsComponent.getAppId())) {
+            throw new ConfigurationException(selectedTranslator.getAppIdDisplay() + " not configured");
+        }
+        if (selectedTranslator.isNeedAppKey() && StringUtil.isEmpty(settingsComponent.getAppKey())) {
+            throw new ConfigurationException(selectedTranslator.getAppKeyDisplay() + " not configured");
+        }
+
+        settingsState.setSelectedTranslator(selectedTranslator);
+        if (selectedTranslator.isNeedAppId()) {
+            settingsState.setAppId(selectedTranslator.getKey(), settingsComponent.getAppId());
+        }
+        if (selectedTranslator.isNeedAppKey()) {
+            settingsState.setAppKey(selectedTranslator.getKey(), settingsComponent.getAppKey());
+        }
+        settingsState.setEnableCache(settingsComponent.isEnableCache());
+        settingsState.setMaxCacheSize(settingsComponent.getMaxCacheSize());
+        settingsState.setTranslationInterval(settingsComponent.getTranslationInterval());
+
+        TranslatorService translatorService = TranslatorService.getInstance();
+        translatorService.setSelectedTranslator(selectedTranslator);
+        translatorService.setEnableCache(settingsComponent.isEnableCache());
+        translatorService.setMaxCacheSize(settingsComponent.getMaxCacheSize());
+        translatorService.setTranslationInterval(settingsComponent.getTranslationInterval());
+    }
+
+    @Override
+    public void reset() {
+        LOG.info("reset");
+        SettingsState settingsState = SettingsState.getInstance();
+        AbstractTranslator selectedTranslator = settingsState.getSelectedTranslator();
+        settingsComponent.setSelectedTranslator(selectedTranslator);
+        settingsComponent.setAppId(settingsState.getAppId(selectedTranslator.getKey()));
+        settingsComponent.setAppKey(settingsState.getAppKey(selectedTranslator.getKey()));
+        settingsComponent.setEnableCache(settingsState.isEnableCache());
+        settingsComponent.setMaxCacheSize(settingsState.getMaxCacheSize());
+        settingsComponent.setTranslationInterval(settingsState.getTranslationInterval());
+    }
+
+    @Override
+    public void disposeUIResources() {
+        settingsComponent = null;
+    }
 }

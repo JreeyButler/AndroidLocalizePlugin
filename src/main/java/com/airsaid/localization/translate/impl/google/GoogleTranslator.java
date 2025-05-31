@@ -35,62 +35,62 @@ import java.util.List;
  */
 @AutoService(AbstractTranslator.class)
 public class GoogleTranslator extends AbsGoogleTranslator {
-  public static final String KEY = "Google";
+    public static final String KEY = "Google";
 
-  public static final String HOST_URL = "https://translate.googleapis.com";
-  private static final String BASE_URL = HOST_URL.concat("/translate_a/single");
+    public static final String HOST_URL = "https://translate.googleapis.com";
+    private static final String BASE_URL = HOST_URL.concat("/translate_a/single");
 
-  @Override
-  public @NotNull String getKey() {
-    return KEY;
-  }
+    @Override
+    public @NotNull String getKey() {
+        return KEY;
+    }
 
-  @Override
-  public @NotNull String getName() {
-    return "Google";
-  }
+    @Override
+    public @NotNull String getName() {
+        return "Google";
+    }
 
-  @Override
-  public boolean isNeedAppId() {
-    return false;
-  }
+    @Override
+    public boolean isNeedAppId() {
+        return false;
+    }
 
-  @Override
-  public boolean isNeedAppKey() {
-    return false;
-  }
+    @Override
+    public boolean isNeedAppKey() {
+        return false;
+    }
 
-  @Override
-  public @NotNull String getRequestUrl(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
-    return new UrlBuilder(BASE_URL)
-        .addQueryParameter("sl", fromLang.getTranslationCode()) // source language code (auto for auto detection)
-        .addQueryParameter("tl", toLang.getTranslationCode()) // translation language
-        .addQueryParameter("client", "gtx") // client of request (guess)
-        .addQueryParameters("dt", "t") // specify what to return
-        .addQueryParameter("dj", "1") // json response with names
-        .addQueryParameter("ie", "UTF-8") // input encoding
-        .addQueryParameter("oe", "UTF-8") // output encoding
-        .addQueryParameter("tk", GoogleToken.getToken(text)) // translate token
-        .build();
-  }
+    @Override
+    public @NotNull String getRequestUrl(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
+        return new UrlBuilder(BASE_URL)
+                .addQueryParameter("sl", fromLang.getTranslationCode()) // source language code (auto for auto detection)
+                .addQueryParameter("tl", toLang.getTranslationCode()) // translation language
+                .addQueryParameter("client", "gtx") // client of request (guess)
+                .addQueryParameters("dt", "t") // specify what to return
+                .addQueryParameter("dj", "1") // json response with names
+                .addQueryParameter("ie", "UTF-8") // input encoding
+                .addQueryParameter("oe", "UTF-8") // output encoding
+                .addQueryParameter("tk", GoogleToken.getToken(text)) // translate token
+                .build();
+    }
 
-  @Override
-  public @NotNull List<Pair<String, String>> getRequestParams(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
-    List<Pair<String, String>> params = new ArrayList<>();
-    params.add(Pair.create("q", text));
-    return params;
-  }
+    @Override
+    public @NotNull List<Pair<String, String>> getRequestParams(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
+        List<Pair<String, String>> params = new ArrayList<>();
+        params.add(Pair.create("q", text));
+        return params;
+    }
 
-  @Override
-  public void configureRequestBuilder(@NotNull RequestBuilder requestBuilder) {
-    requestBuilder.userAgent(AgentUtil.getUserAgent())
-        .tuner(connection -> connection.setRequestProperty("Referer", GoogleTranslator.HOST_URL));
-  }
+    @Override
+    public void configureRequestBuilder(@NotNull RequestBuilder requestBuilder) {
+        requestBuilder.userAgent(AgentUtil.getUserAgent())
+                .tuner(connection -> connection.setRequestProperty("Referer", GoogleTranslator.HOST_URL));
+    }
 
-  @Override
-  public @NotNull String parsingResult(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text, @NotNull String resultText) {
-    LOG.info("parsingResult: " + resultText);
-    GoogleTranslationResult googleTranslationResult = GsonUtil.getInstance().getGson().fromJson(resultText, GoogleTranslationResult.class);
-    return googleTranslationResult.getTranslationResult();
-  }
+    @Override
+    public @NotNull String parsingResult(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text, @NotNull String resultText) {
+        LOG.info("parsingResult: " + resultText);
+        GoogleTranslationResult googleTranslationResult = GsonUtil.getInstance().getGson().fromJson(resultText, GoogleTranslationResult.class);
+        return googleTranslationResult.getTranslationResult();
+    }
 }
