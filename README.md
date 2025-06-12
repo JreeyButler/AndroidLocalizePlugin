@@ -7,6 +7,7 @@
 
 [Website](https://plugins.jetbrains.com/plugin/11174-androidlocalize) | [GitHub](https://github.com/Airsaid/AndroidLocalizePlugin) | [Issues](https://github.com/Airsaid/AndroidLocalizePlugin/issues) | [Reviews](https://plugins.jetbrains.com/plugin/11174-androidlocalize/reviews)
 
+<!-- Plugin description -->
 Android localization plugin supporting multiple languages and translators. Developed based on IntelliJ Platform SDK, featuring a modular design and flexible translation service integration.
 
 # Features
@@ -27,15 +28,7 @@ Android localization plugin supporting multiple languages and translators. Devel
 - Support for excluding specific text
 - Translation caching support
 - Configurable translation interval
-
-## Technical Features
-- Modular architecture design
-- Plugin hot-plug support
-- Asynchronous task processing
-- Multi-level caching mechanism
-- Extensible translation service interface
-- Secure configuration management
-- Comprehensive error handling
+<!-- Plugin description end -->
 
 # Architecture Design
 
