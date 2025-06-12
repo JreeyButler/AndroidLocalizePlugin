@@ -1,74 +1,161 @@
-**English** | [简体中文](README_CN.md)
+**简体中文** | [English](README.md)
 
 # ![image](https://raw.githubusercontent.com/Airsaid/AndroidLocalizePlugin/85cf5020832523ea333ad09286af55880460457a/src/main/resources/META-INF/pluginIcon.svg) AndroidLocalizePlugin
 [![Plugin Version](https://img.shields.io/jetbrains/plugin/v/11174)](https://plugins.jetbrains.com/plugin/11174-androidlocalize)
 [![Plugin Rating](https://img.shields.io/jetbrains/plugin/r/rating/11174)](https://plugins.jetbrains.com/plugin/11174-androidlocalize)
 [![Build](https://github.com/Airsaid/AndroidLocalizePlugin/workflows/Build/badge.svg)](https://github.com/Airsaid/AndroidLocalizePlugin/actions/workflows/build.yml)
 
-<!-- Plugin description -->
 [Website](https://plugins.jetbrains.com/plugin/11174-androidlocalize) | [GitHub](https://github.com/Airsaid/AndroidLocalizePlugin) | [Issues](https://github.com/Airsaid/AndroidLocalizePlugin/issues) | [Reviews](https://plugins.jetbrains.com/plugin/11174-androidlocalize/reviews)
 
-Android localization plugin. supports multiple languages and multiple translators.
+Android localization plugin supporting multiple languages and translators. Developed based on IntelliJ Platform SDK, featuring a modular design and flexible translation service integration.
 
 # Features
+
+## Core Features
 - Multiple translator support:
-  - Google translator. 
-  - Microsoft translator.
-  - Baidu translator.
-  - Youdao translator.
-  - Ali translator.
-  - DeepL translator.
-  - OpenAI ChatGPT translator.
-- Supports up to 100+ languages.
-- One key generates all translation files.
-- Support no translation of existing string.
-- Support for specifying that text is not translated.
-- Support for caching translated strings. 
-- Support to set the translation interval time.
+  - Google Translate (Free and API versions)
+  - Microsoft Translator
+  - Baidu Translator
+  - Youdao Translator
+  - Alibaba Translator
+  - DeepL Translator (Free and Pro versions)
+  - OpenAI ChatGPT Translator
+  - ByteDance Translator
+- Support for 100+ languages
+- One-click generation of all translation files
+- Support for skipping existing strings
+- Support for excluding specific text
+- Translation caching support
+- Configurable translation interval
 
-# Usage
-- Step 1: Select the `values/strings.xml`(or any string resource in `values` directory).
-- Step 2: Right click and select "Translate to Other Languages".
-- Step 3: Select the languages to be translated.
-- Step 4: Click OK.
+## Technical Features
+- Modular architecture design
+- Plugin hot-plug support
+- Asynchronous task processing
+- Multi-level caching mechanism
+- Extensible translation service interface
+- Secure configuration management
+- Comprehensive error handling
 
-<!-- Plugin description end -->
+# Architecture Design
+
+## Core Modules
+- `translate`: Translation core module
+  - Multiple translation service support
+  - Extensible translation interface
+  - Translation result caching
+- `services`: Service layer
+  - Translation service management
+  - Resource file processing
+  - Configuration management
+- `task`: Task processing
+  - Asynchronous translation tasks
+  - Progress management
+  - Cancellation support
+- `action`: User interaction
+  - Menu items
+  - Dialogs
+  - Settings interface
+- `config`: Configuration management
+  - Persistent storage
+  - Secure configuration
+- `utils`: Utility classes
+  - Text processing
+  - File operations
+  - Common utilities
+
+## Design Patterns
+- Strategy Pattern: Translator implementation
+- Singleton Pattern: Service classes
+- Observer Pattern: Task callbacks
+- Factory Pattern: Object creation
+
+# User Guide
+
+## Basic Usage
+1. Select `values/strings.xml` file (or any resource file in the values directory)
+2. Right-click and select "Translate to Other Languages"
+3. Check the languages you want to translate to
+4. Click OK to start translation
+
+## Advanced Configuration
+1. Translator Settings
+   - Select default translator
+   - Configure API keys
+   - Set translation parameters
+2. Cache Settings
+   - Enable/disable cache
+   - Set cache size
+   - Configure cache strategy
+3. Performance Settings
+   - Translation interval
+   - Concurrent task count
+   - Timeout settings
+
+# Development Guide
+
+## Requirements
+- JDK 11+
+- IntelliJ IDEA 2020.3+
+- Gradle 7.0+
+
+## Adding New Translators
+1. Implement the `AbstractTranslator` interface
+2. Register using `@AutoService` annotation
+3. Implement necessary translation methods
+4. Add configuration support
+
+## Building and Testing
+```bash
+# Build plugin
+./gradlew build
+
+# Run tests
+./gradlew test
+
+# Build release version
+./gradlew buildPlugin
+```
 
 # Preview
 ![image](preview/preview.gif)
 ![image](preview/settings.png)
 
-# Install
+# Installation
 [![Install Plugin](preview/install.png)](https://plugins.jetbrains.com/plugin/11174-androidlocalize)
 
 # FAQ
-- Q: How to ignore translation?
 
-    A: Use the [translatable or xliff:g](https://developer.android.com/guide/topics/resources/localization#managing-strings) tags. for example:
+## Translation Related
+- Q: How to exclude text from translation?
+
+    A: You can use [translatable or xliff:g](https://developer.android.com/guide/topics/resources/localization#managing-strings) tags. Example:
     ```
     <string name="app_name" translatable="false">HelloAndroid</string>
     <string name="star_rating">Check out our 5<xliff:g id="star">\u2605</xliff:g></string>
     <string name="app_home_url">Visit us at <xliff:g id="application_homepage">https://github.com/Airsaid/AndroidLocalizePlugin</xliff:g></string>
     <string name="prod_name">Learn more at <xliff:g id="game_group">Muggle Game Studio</xliff:g></string>
     ```
-    **Note: Display one line without extra line breaks and spaces in between.**
+  **Note: Display in one line, no extra line breaks or spaces in between.**
+
+## Error Handling
 - Q: Translation failure: java.net.HttpRetryException: cannot retry due to redirection, in streaming mode
-  
-  A: If you are using the default translation engine (Google), then you can try switching to another engine on the settings page and use your own account for translation. Because the default translation engine is not stable.
 
-# ChangeLog
-[ChangeLog](CHANGELOG.md)
+   A: If you're using the default translation engine (Google), try switching to another engine in the settings page and use your own account for translation. The default translation engine is not stable.
 
-# Support and Donations
+# Changelog
+[Changelog](CHANGELOG.md)
 
-You can contribute and support this project by doing any of the following:
+# Support and Donation
 
-- Star the project on GitHub.
-- Give feedback.
-- Commit PR.
-- Contribute your ideas/suggestions.
-- Share the plugin with your friends/colleagues.
-- If you like the plugin, please consider making a donation to keep the plugin active:
+You can contribute and support this project by:
+
+- Star the project on GitHub
+- Report issues
+- Submit PRs
+- Share your ideas and suggestions
+- Share the plugin with your friends and colleagues
+- If you like this plugin, please consider donating to maintain the plugin and future updates:
 
   <table>
     <thead align="center">
