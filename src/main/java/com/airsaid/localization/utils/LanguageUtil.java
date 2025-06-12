@@ -36,57 +36,57 @@ import java.util.Objects;
  */
 public class LanguageUtil {
 
-  private static final String SEPARATOR_SELECTED_LANGUAGES_CODE = ",";
+    private static final String SEPARATOR_SELECTED_LANGUAGES_CODE = ",";
 
-  private LanguageUtil() {
-    throw new AssertionError("No com.airsaid.localization.utils.LanguageUtil instances for you!");
-  }
-
-  /**
-   * Save the language data selected in the current project.
-   *
-   * @param project   current project.
-   * @param languages selected language.
-   */
-  public static void saveSelectedLanguage(@NotNull Project project, @NotNull List<Lang> languages) {
-    Objects.requireNonNull(project);
-    Objects.requireNonNull(languages);
-
-    PropertiesComponent.getInstance(project)
-        .setValue(Constants.KEY_SELECTED_LANGUAGES, getLanguageIdString(languages));
-  }
-
-  /**
-   * Get saved language code data in the current project.
-   *
-   * @param project current project.
-   * @return null if not saved, otherwise return the saved language id data.
-   */
-  @Nullable
-  public static List<String> getSelectedLanguageIds(@NotNull Project project) {
-    Objects.requireNonNull(project);
-
-    String codeString = PropertiesComponent.getInstance(project)
-        .getValue(Constants.KEY_SELECTED_LANGUAGES);
-
-    if (TextUtils.isEmpty(codeString)) {
-      return null;
+    private LanguageUtil() {
+        throw new AssertionError("No com.airsaid.localization.utils.LanguageUtil instances for you!");
     }
 
-    return Arrays.asList(codeString.split(SEPARATOR_SELECTED_LANGUAGES_CODE));
-  }
+    /**
+     * Save the language data selected in the current project.
+     *
+     * @param project   current project.
+     * @param languages selected language.
+     */
+    public static void saveSelectedLanguage(@NotNull Project project, @NotNull List<Lang> languages) {
+        Objects.requireNonNull(project);
+        Objects.requireNonNull(languages);
 
-  @NotNull
-  private static String getLanguageIdString(@NotNull List<Lang> language) {
-    StringBuilder codes = new StringBuilder(language.size());
-    for (int i = 0, len = language.size(); i < len; i++) {
-      Lang lang = language.get(i);
-      codes.append(lang.getId());
-      if (i < len - 1) {
-        codes.append(SEPARATOR_SELECTED_LANGUAGES_CODE);
-      }
+        PropertiesComponent.getInstance(project)
+                .setValue(Constants.KEY_SELECTED_LANGUAGES, getLanguageIdString(languages));
     }
-    return codes.toString();
-  }
+
+    /**
+     * Get saved language code data in the current project.
+     *
+     * @param project current project.
+     * @return null if not saved, otherwise return the saved language id data.
+     */
+    @Nullable
+    public static List<String> getSelectedLanguageIds(@NotNull Project project) {
+        Objects.requireNonNull(project);
+
+        String codeString = PropertiesComponent.getInstance(project)
+                .getValue(Constants.KEY_SELECTED_LANGUAGES);
+
+        if (TextUtils.isEmpty(codeString)) {
+            return null;
+        }
+
+        return Arrays.asList(codeString.split(SEPARATOR_SELECTED_LANGUAGES_CODE));
+    }
+
+    @NotNull
+    private static String getLanguageIdString(@NotNull List<Lang> language) {
+        StringBuilder codes = new StringBuilder(language.size());
+        for (int i = 0, len = language.size(); i < len; i++) {
+            Lang lang = language.get(i);
+            codes.append(lang.getId());
+            if (i < len - 1) {
+                codes.append(SEPARATOR_SELECTED_LANGUAGES_CODE);
+            }
+        }
+        return codes.toString();
+    }
 
 }

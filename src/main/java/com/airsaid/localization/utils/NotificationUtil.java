@@ -28,27 +28,27 @@ import org.jetbrains.annotations.Nullable;
  */
 public class NotificationUtil {
 
-  private static final String NOTIFICATION_GROUP_ID = "Android Localize Plugin";
+    private static final String NOTIFICATION_GROUP_ID = "Android Localize Plugin";
 
-  private static final NotificationGroup NOTIFICATION_GROUP =
-      NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID);
+    private static final NotificationGroup NOTIFICATION_GROUP =
+            NotificationGroupManager.getInstance().getNotificationGroup(NOTIFICATION_GROUP_ID);
 
-  private NotificationUtil() {
-    throw new AssertionError("No com.airsaid.localization.utils.NotificationUtil instances for you!");
-  }
+    private NotificationUtil() {
+        throw new AssertionError("No com.airsaid.localization.utils.NotificationUtil instances for you!");
+    }
 
-  public static void notifyInfo(@Nullable Project project, String content) {
-    NOTIFICATION_GROUP.createNotification(content, NotificationType.INFORMATION)
-        .notify(project);
-  }
+    public static void notifyInfo(@Nullable Project project, String content) {
+        NOTIFICATION_GROUP.createNotification(content, NotificationType.INFORMATION)
+                .notify(project);
+    }
 
-  public static void notifyWarning(@Nullable Project project, String content) {
-    NOTIFICATION_GROUP.createNotification(content, NotificationType.WARNING)
-        .notify(project);
-  }
+    public static void notifyWarning(@Nullable Project project, String content) {
+        NOTIFICATION_GROUP.createNotification(content, NotificationType.WARNING)
+                .notify(project);
+    }
 
-  public static void notifyError(@Nullable Project project, String content) {
-    NOTIFICATION_GROUP.createNotification(content, NotificationType.ERROR)
-        .notify(project);
-  }
+    public static void notifyError(@Nullable Project project, String content) {
+        NOTIFICATION_GROUP.createNotification(content, NotificationType.ERROR)
+                .notify(project);
+    }
 }

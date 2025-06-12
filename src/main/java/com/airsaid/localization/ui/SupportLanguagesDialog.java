@@ -34,41 +34,41 @@ import java.util.List;
  */
 public class SupportLanguagesDialog extends DialogWrapper {
 
-  private final AbstractTranslator mTranslator;
+    private final AbstractTranslator mTranslator;
 
-  public SupportLanguagesDialog(AbstractTranslator translator) {
-    super(true);
-    setTitle(translator.getName() + " Translator Supported Languages");
-    mTranslator = translator;
-    init();
-  }
-
-  @Override
-  protected @Nullable JComponent createCenterPanel() {
-    List<Lang> supportedLanguages = mTranslator.getSupportedLanguages();
-    supportedLanguages.sort(new EnglishNameComparator());
-    JPanel contentPanel = new JPanel(new GridLayout(supportedLanguages.size() / 4, 4, 10, 20));
-    for (Lang supportedLanguage : supportedLanguages) {
-      contentPanel.add(new JBLabel(supportedLanguage.getEnglishName()));
+    public SupportLanguagesDialog(AbstractTranslator translator) {
+        super(true);
+        setTitle(translator.getName() + " Translator Supported Languages");
+        mTranslator = translator;
+        init();
     }
-    return contentPanel;
-  }
 
-  @Override
-  protected @Nullable String getDimensionServiceKey() {
-    String key = mTranslator.getKey();
-    return "#com.airsaid.localization.ui.SupportLanguagesDialog#".concat(key);
-  }
-
-  @Override
-  protected Action @NotNull [] createActions() {
-    return new Action[]{};
-  }
-
-  static class EnglishNameComparator implements Comparator<Lang> {
     @Override
-    public int compare(Lang o1, Lang o2) {
-      return o1.getEnglishName().compareTo(o2.getEnglishName());
+    protected @Nullable JComponent createCenterPanel() {
+        List<Lang> supportedLanguages = mTranslator.getSupportedLanguages();
+        supportedLanguages.sort(new EnglishNameComparator());
+        JPanel contentPanel = new JPanel(new GridLayout(supportedLanguages.size() / 4, 4, 10, 20));
+        for (Lang supportedLanguage : supportedLanguages) {
+            contentPanel.add(new JBLabel(supportedLanguage.getEnglishName()));
+        }
+        return contentPanel;
     }
-  }
+
+    @Override
+    protected @Nullable String getDimensionServiceKey() {
+        String key = mTranslator.getKey();
+        return "#com.airsaid.localization.ui.SupportLanguagesDialog#".concat(key);
+    }
+
+    @Override
+    protected Action @NotNull [] createActions() {
+        return new Action[]{};
+    }
+
+    static class EnglishNameComparator implements Comparator<Lang> {
+        @Override
+        public int compare(Lang o1, Lang o2) {
+            return o1.getEnglishName().compareTo(o2.getEnglishName());
+        }
+    }
 }

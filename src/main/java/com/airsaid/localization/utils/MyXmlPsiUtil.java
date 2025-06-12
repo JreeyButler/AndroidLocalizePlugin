@@ -24,6 +24,6 @@ import com.intellij.psi.xml.XmlFile;
 public class MyXmlPsiUtil {
     public static XmlFile createXmlFileFromString(Project project, String xmlContent) {
         return (XmlFile) PsiFileFactory.getInstance(project)
-            .createFileFromText("temp.xml", XMLLanguage.INSTANCE, xmlContent);
+                .createFileFromText("temp.xml", XMLLanguage.INSTANCE, xmlContent);
     }
 }

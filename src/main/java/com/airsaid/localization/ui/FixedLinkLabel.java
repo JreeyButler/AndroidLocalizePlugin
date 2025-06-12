@@ -29,30 +29,30 @@ import java.awt.event.MouseEvent;
  * @author airsaid
  */
 public class FixedLinkLabel extends LinkLabel<Object> {
-  private boolean isDoClick = false;
+    private boolean isDoClick = false;
 
-  public FixedLinkLabel() {
-    super("", AllIcons.Ide.Link);
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseReleased(MouseEvent e) {
-        if (isEnabled() && isInClickableArea(e.getPoint())) {
-          doClick();
-        }
-      }
+    public FixedLinkLabel() {
+        super("", AllIcons.Ide.Link);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (isEnabled() && isInClickableArea(e.getPoint())) {
+                    doClick();
+                }
+            }
 
-      @Override
-      public void mouseExited(MouseEvent e) {
-        isDoClick = false;
-      }
-    });
-  }
-
-  @Override
-  public void doClick() {
-    if (!isDoClick) {
-      isDoClick = true;
-      super.doClick();
+            @Override
+            public void mouseExited(MouseEvent e) {
+                isDoClick = false;
+            }
+        });
     }
-  }
+
+    @Override
+    public void doClick() {
+        if (!isDoClick) {
+            isDoClick = true;
+            super.doClick();
+        }
+    }
 }

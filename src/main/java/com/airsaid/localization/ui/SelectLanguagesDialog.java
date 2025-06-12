@@ -43,144 +43,144 @@ import java.util.Objects;
  * @author airsaid
  */
 public class SelectLanguagesDialog extends DialogWrapper {
-  private JPanel contentPanel;
-  private JCheckBox overwriteExistingStringCheckBox;
-  private JCheckBox selectAllCheckBox;
-  private JPanel languagesPanel;
-  private JCheckBox openTranslatedFileCheckBox;
-  private JLabel powerTranslatorLabel;
+    private JPanel contentPanel;
+    private JCheckBox overwriteExistingStringCheckBox;
+    private JCheckBox selectAllCheckBox;
+    private JPanel languagesPanel;
+    private JCheckBox openTranslatedFileCheckBox;
+    private JLabel powerTranslatorLabel;
 
-  private final Project project;
-  private OnClickListener onClickListener;
-  private final List<Lang> selectedLanguages = new ArrayList<>();
+    private final Project project;
+    private OnClickListener onClickListener;
+    private final List<Lang> selectedLanguages = new ArrayList<>();
 
-  public interface OnClickListener {
-    void onClickListener(List<Lang> selectedLanguage);
-  }
-
-  public SelectLanguagesDialog(@Nullable Project project) {
-    super(project, false);
-    this.project = project;
-    doCreateCenterPanel();
-    setTitle("Select Translated Languages");
-    init();
-  }
-
-  public void setOnClickListener(OnClickListener listener) {
-    onClickListener = listener;
-  }
-
-  @Nullable
-  @Override
-  protected JComponent createCenterPanel() {
-    return contentPanel;
-  }
-
-  private void doCreateCenterPanel() {
-    // add languages
-    selectedLanguages.clear();
-    List<Lang> supportedLanguages = Objects.requireNonNull(TranslatorService.getInstance().getSelectedTranslator()).getSupportedLanguages();
-    supportedLanguages.sort(new EnglishNameComparator()); // sort by english name, easy to find
-    addLanguageList(supportedLanguages);
-
-    // add options
-    initOverwriteExistingStringOption();
-    initOpenTranslatedFileCheckBox();
-    initSelectAllOption();
-
-    // set power ui
-    AbstractTranslator translator = TranslatorService.getInstance().getSelectedTranslator();
-    powerTranslatorLabel.setText("Powered by " + translator.getName());
-    powerTranslatorLabel.setIcon(translator.getIcon());
-  }
-
-  private void addLanguageList(List<Lang> supportedLanguages) {
-    List<String> selectedLanguageIds = LanguageUtil.getSelectedLanguageIds(project);
-    languagesPanel.setLayout(new GridLayout(supportedLanguages.size() / 4, 4));
-    for (Lang language : supportedLanguages) {
-      String code = language.getCode();
-      JBCheckBox checkBoxLanguage = new JBCheckBox();
-      checkBoxLanguage.setText(language.getEnglishName()
-          .concat("(").concat(code).concat(")"));
-      languagesPanel.add(checkBoxLanguage);
-      checkBoxLanguage.addItemListener(e -> {
-        int state = e.getStateChange();
-        if (state == ItemEvent.SELECTED) {
-          selectedLanguages.add(language);
-        } else {
-          selectedLanguages.remove(language);
-        }
-        // Update the OK button UI
-        getOKAction().setEnabled(selectedLanguages.size() > 0);
-      });
-      if (selectedLanguageIds != null && selectedLanguageIds.contains(String.valueOf(language.getId()))) {
-        checkBoxLanguage.setSelected(true);
-      }
+    public interface OnClickListener {
+        void onClickListener(List<Lang> selectedLanguage);
     }
-  }
 
-  private void initOverwriteExistingStringOption() {
-    boolean isOverwriteExistingString = PropertiesComponent.getInstance(project)
-        .getBoolean(Constants.KEY_IS_OVERWRITE_EXISTING_STRING);
-    overwriteExistingStringCheckBox.setSelected(isOverwriteExistingString);
-    overwriteExistingStringCheckBox.addItemListener(e -> {
-      int state = e.getStateChange();
-      PropertiesComponent.getInstance(project)
-          .setValue(Constants.KEY_IS_OVERWRITE_EXISTING_STRING, state == ItemEvent.SELECTED);
-    });
-  }
-
-  private void initOpenTranslatedFileCheckBox() {
-    boolean isOpenTranslatedFile = PropertiesComponent.getInstance(project)
-        .getBoolean(Constants.KEY_IS_OPEN_TRANSLATED_FILE);
-    openTranslatedFileCheckBox.setSelected(isOpenTranslatedFile);
-    openTranslatedFileCheckBox.addItemListener(e -> {
-      int state = e.getStateChange();
-      PropertiesComponent.getInstance(project)
-          .setValue(Constants.KEY_IS_OPEN_TRANSLATED_FILE, state == ItemEvent.SELECTED);
-    });
-  }
-
-  private void initSelectAllOption() {
-    boolean isSelectAll = PropertiesComponent.getInstance(project)
-        .getBoolean(Constants.KEY_IS_SELECT_ALL);
-    selectAllCheckBox.setSelected(isSelectAll);
-    selectAllCheckBox.addItemListener(e -> {
-      int state = e.getStateChange();
-      selectAll(state == ItemEvent.SELECTED);
-      PropertiesComponent.getInstance(project)
-          .setValue(Constants.KEY_IS_SELECT_ALL, state == ItemEvent.SELECTED);
-    });
-  }
-
-  private void selectAll(boolean selectAll) {
-    for (Component component : languagesPanel.getComponents()) {
-      if (component instanceof JBCheckBox) {
-        JBCheckBox checkBox = (JBCheckBox) component;
-        checkBox.setSelected(selectAll);
-      }
+    public SelectLanguagesDialog(@Nullable Project project) {
+        super(project, false);
+        this.project = project;
+        doCreateCenterPanel();
+        setTitle("Select Translated Languages");
+        init();
     }
-  }
 
-  @Override
-  protected @Nullable String getDimensionServiceKey() {
-    String key = SettingsState.getInstance().getSelectedTranslator().getKey();
-    return "#com.airsaid.localization.ui.SelectLanguagesDialog#".concat(key);
-  }
-
-  @Override
-  protected void doOKAction() {
-    LanguageUtil.saveSelectedLanguage(project, selectedLanguages);
-    if (onClickListener != null) {
-      onClickListener.onClickListener(selectedLanguages);
+    public void setOnClickListener(OnClickListener listener) {
+        onClickListener = listener;
     }
-    super.doOKAction();
-  }
 
-  static class EnglishNameComparator implements Comparator<Lang> {
+    @Nullable
     @Override
-    public int compare(Lang o1, Lang o2) {
-      return o1.getEnglishName().compareTo(o2.getEnglishName());
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
-  }
+
+    private void doCreateCenterPanel() {
+        // add languages
+        selectedLanguages.clear();
+        List<Lang> supportedLanguages = Objects.requireNonNull(TranslatorService.getInstance().getSelectedTranslator()).getSupportedLanguages();
+        supportedLanguages.sort(new EnglishNameComparator()); // sort by english name, easy to find
+        addLanguageList(supportedLanguages);
+
+        // add options
+        initOverwriteExistingStringOption();
+        initOpenTranslatedFileCheckBox();
+        initSelectAllOption();
+
+        // set power ui
+        AbstractTranslator translator = TranslatorService.getInstance().getSelectedTranslator();
+        powerTranslatorLabel.setText("Powered by " + translator.getName());
+        powerTranslatorLabel.setIcon(translator.getIcon());
+    }
+
+    private void addLanguageList(List<Lang> supportedLanguages) {
+        List<String> selectedLanguageIds = LanguageUtil.getSelectedLanguageIds(project);
+        languagesPanel.setLayout(new GridLayout(supportedLanguages.size() / 4, 4));
+        for (Lang language : supportedLanguages) {
+            String code = language.getCode();
+            JBCheckBox checkBoxLanguage = new JBCheckBox();
+            checkBoxLanguage.setText(language.getEnglishName()
+                    .concat("(").concat(code).concat(")"));
+            languagesPanel.add(checkBoxLanguage);
+            checkBoxLanguage.addItemListener(e -> {
+                int state = e.getStateChange();
+                if (state == ItemEvent.SELECTED) {
+                    selectedLanguages.add(language);
+                } else {
+                    selectedLanguages.remove(language);
+                }
+                // Update the OK button UI
+                getOKAction().setEnabled(selectedLanguages.size() > 0);
+            });
+            if (selectedLanguageIds != null && selectedLanguageIds.contains(String.valueOf(language.getId()))) {
+                checkBoxLanguage.setSelected(true);
+            }
+        }
+    }
+
+    private void initOverwriteExistingStringOption() {
+        boolean isOverwriteExistingString = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_OVERWRITE_EXISTING_STRING);
+        overwriteExistingStringCheckBox.setSelected(isOverwriteExistingString);
+        overwriteExistingStringCheckBox.addItemListener(e -> {
+            int state = e.getStateChange();
+            PropertiesComponent.getInstance(project)
+                    .setValue(Constants.KEY_IS_OVERWRITE_EXISTING_STRING, state == ItemEvent.SELECTED);
+        });
+    }
+
+    private void initOpenTranslatedFileCheckBox() {
+        boolean isOpenTranslatedFile = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_OPEN_TRANSLATED_FILE);
+        openTranslatedFileCheckBox.setSelected(isOpenTranslatedFile);
+        openTranslatedFileCheckBox.addItemListener(e -> {
+            int state = e.getStateChange();
+            PropertiesComponent.getInstance(project)
+                    .setValue(Constants.KEY_IS_OPEN_TRANSLATED_FILE, state == ItemEvent.SELECTED);
+        });
+    }
+
+    private void initSelectAllOption() {
+        boolean isSelectAll = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_SELECT_ALL);
+        selectAllCheckBox.setSelected(isSelectAll);
+        selectAllCheckBox.addItemListener(e -> {
+            int state = e.getStateChange();
+            selectAll(state == ItemEvent.SELECTED);
+            PropertiesComponent.getInstance(project)
+                    .setValue(Constants.KEY_IS_SELECT_ALL, state == ItemEvent.SELECTED);
+        });
+    }
+
+    private void selectAll(boolean selectAll) {
+        for (Component component : languagesPanel.getComponents()) {
+            if (component instanceof JBCheckBox) {
+                JBCheckBox checkBox = (JBCheckBox) component;
+                checkBox.setSelected(selectAll);
+            }
+        }
+    }
+
+    @Override
+    protected @Nullable String getDimensionServiceKey() {
+        String key = SettingsState.getInstance().getSelectedTranslator().getKey();
+        return "#com.airsaid.localization.ui.SelectLanguagesDialog#".concat(key);
+    }
+
+    @Override
+    protected void doOKAction() {
+        LanguageUtil.saveSelectedLanguage(project, selectedLanguages);
+        if (onClickListener != null) {
+            onClickListener.onClickListener(selectedLanguages);
+        }
+        super.doOKAction();
+    }
+
+    static class EnglishNameComparator implements Comparator<Lang> {
+        @Override
+        public int compare(Lang o1, Lang o2) {
+            return o1.getEnglishName().compareTo(o2.getEnglishName());
+        }
+    }
 }
