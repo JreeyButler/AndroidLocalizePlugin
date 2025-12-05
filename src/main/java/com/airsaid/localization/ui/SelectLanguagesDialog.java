@@ -53,6 +53,7 @@ public class SelectLanguagesDialog extends DialogWrapper {
     private JCheckBox openTranslatedFileCheckBox;
     private JLabel powerTranslatorLabel;
     private JCheckBox showChineseLanguageName;
+    private JCheckBox sortByLanguageCode;
     private List<Lang> mLangList;
 
     private final Project project;
@@ -96,11 +97,30 @@ public class SelectLanguagesDialog extends DialogWrapper {
         initOpenTranslatedFileCheckBox();
         initSelectAllOption();
         initShowChineseLanguageOption();
+        initSortByLanguageCodeOption();
 
         // set power ui
         AbstractTranslator translator = TranslatorService.getInstance().getSelectedTranslator();
         powerTranslatorLabel.setText("Powered by " + translator.getName());
         powerTranslatorLabel.setIcon(translator.getIcon());
+    }
+
+    private void initSortByLanguageCodeOption() {
+        boolean isSortByLanguageCode = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_SORT_BY_LANGUAGE_CODE);
+        sortByLanguageCode.setSelected(isSortByLanguageCode);
+        sortByLanguageCode.addItemListener(e -> {
+            final int state = e.getStateChange();
+            final boolean isSelected = state == ItemEvent.SELECTED;
+            boolean isShowChinese = PropertiesComponent.getInstance(project)
+                    .getBoolean(Constants.KEY_IS_SHOW_CN_LANGUAGE_NAME);
+            mLangList.sort(isSelected ?
+                    new LanguageCodeComparator() :
+                    new EnglishNameComparator());
+            addLanguageList(mLangList, isShowChinese);
+            PropertiesComponent.getInstance(project)
+                    .setValue(Constants.KEY_IS_SORT_BY_LANGUAGE_CODE, isSelected);
+        });
     }
 
     private void initShowChineseLanguageOption() {
@@ -213,6 +233,14 @@ public class SelectLanguagesDialog extends DialogWrapper {
         @Override
         public int compare(Lang o1, Lang o2) {
             return o1.getEnglishName().compareTo(o2.getEnglishName());
+        }
+    }
+
+    static class LanguageCodeComparator implements Comparator<Lang> {
+
+        @Override
+        public int compare(Lang o1, Lang o2) {
+            return o1.getCode().compareTo(o2.getCode());
         }
     }
 }

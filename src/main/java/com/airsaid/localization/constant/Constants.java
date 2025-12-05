@@ -24,17 +24,19 @@ package com.airsaid.localization.constant;
  */
 public interface Constants {
 
-  String PLUGIN_NAME = "AndroidLocalize";
+    String PLUGIN_NAME = "AndroidLocalize";
 
-  String PLUGIN_ID = "com.github.airsaid.androidlocalize";
+    String PLUGIN_ID = "com.github.airsaid.androidlocalize";
 
-  String KEY_SELECTED_LANGUAGES = PLUGIN_ID.concat(".selected_languages");
+    String KEY_SELECTED_LANGUAGES = PLUGIN_ID.concat(".selected_languages");
 
-  String KEY_IS_OVERWRITE_EXISTING_STRING = PLUGIN_ID.concat(".is_overwrite_existing_string");
+    String KEY_IS_OVERWRITE_EXISTING_STRING = PLUGIN_ID.concat(".is_overwrite_existing_string");
 
-  String KEY_IS_SELECT_ALL = PLUGIN_ID.concat(".is_select_all");
+    String KEY_IS_SELECT_ALL = PLUGIN_ID.concat(".is_select_all");
 
-  String KEY_IS_OPEN_TRANSLATED_FILE = PLUGIN_ID.concat(".is_open_translated_file");
+    String KEY_IS_OPEN_TRANSLATED_FILE = PLUGIN_ID.concat(".is_open_translated_file");
 
-  String KEY_IS_SHOW_CN_LANGUAGE_NAME = PLUGIN_ID.concat(".is_show_cn_language_name");
+    String KEY_IS_SHOW_CN_LANGUAGE_NAME = PLUGIN_ID.concat(".is_show_cn_language_name");
+
+    String KEY_IS_SORT_BY_LANGUAGE_CODE = PLUGIN_ID.concat(".is_sort_by_language_code");
 }
