@@ -86,7 +86,11 @@ public class SelectLanguagesDialog extends DialogWrapper {
         // add languages
         selectedLanguages.clear();
         List<Lang> supportedLanguages = Objects.requireNonNull(TranslatorService.getInstance().getSelectedTranslator()).getSupportedLanguages();
-        supportedLanguages.sort(new EnglishNameComparator()); // sort by english name, easy to find
+        final boolean isSortByLanguageCode = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_SORT_BY_LANGUAGE_CODE);
+        supportedLanguages.sort(isSortByLanguageCode ?
+                new LanguageCodeComparator() :
+                new EnglishNameComparator());
         boolean isShowChinese = PropertiesComponent.getInstance(project)
                 .getBoolean(Constants.KEY_IS_SHOW_CN_LANGUAGE_NAME);
         mLangList = supportedLanguages;
