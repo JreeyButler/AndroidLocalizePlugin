@@ -36,4 +36,5 @@ public interface Constants {
 
   String KEY_IS_OPEN_TRANSLATED_FILE = PLUGIN_ID.concat(".is_open_translated_file");
 
+  String KEY_IS_SHOW_CN_LANGUAGE_NAME = PLUGIN_ID.concat(".is_show_cn_language_name");
 }

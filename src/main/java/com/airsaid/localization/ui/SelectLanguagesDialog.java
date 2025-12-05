@@ -24,6 +24,7 @@ import com.airsaid.localization.translate.lang.Lang;
 import com.airsaid.localization.translate.services.TranslatorService;
 import com.airsaid.localization.utils.LanguageUtil;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBCheckBox;
@@ -43,12 +44,16 @@ import java.util.Objects;
  * @author airsaid
  */
 public class SelectLanguagesDialog extends DialogWrapper {
+    private static final Logger LOG = Logger.getInstance(SelectLanguagesDialog.class);
+
     private JPanel contentPanel;
     private JCheckBox overwriteExistingStringCheckBox;
     private JCheckBox selectAllCheckBox;
     private JPanel languagesPanel;
     private JCheckBox openTranslatedFileCheckBox;
     private JLabel powerTranslatorLabel;
+    private JCheckBox showChineseLanguageName;
+    private List<Lang> mLangList;
 
     private final Project project;
     private OnClickListener onClickListener;
@@ -81,12 +86,16 @@ public class SelectLanguagesDialog extends DialogWrapper {
         selectedLanguages.clear();
         List<Lang> supportedLanguages = Objects.requireNonNull(TranslatorService.getInstance().getSelectedTranslator()).getSupportedLanguages();
         supportedLanguages.sort(new EnglishNameComparator()); // sort by english name, easy to find
-        addLanguageList(supportedLanguages);
+        boolean isShowChinese = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_SHOW_CN_LANGUAGE_NAME);
+        mLangList = supportedLanguages;
+        addLanguageList(mLangList, isShowChinese);
 
         // add options
         initOverwriteExistingStringOption();
         initOpenTranslatedFileCheckBox();
         initSelectAllOption();
+        initShowChineseLanguageOption();
 
         // set power ui
         AbstractTranslator translator = TranslatorService.getInstance().getSelectedTranslator();
@@ -94,15 +103,34 @@ public class SelectLanguagesDialog extends DialogWrapper {
         powerTranslatorLabel.setIcon(translator.getIcon());
     }
 
-    private void addLanguageList(List<Lang> supportedLanguages) {
+    private void initShowChineseLanguageOption() {
+        boolean isShowChineseLanguageName = PropertiesComponent.getInstance(project)
+                .getBoolean(Constants.KEY_IS_SHOW_CN_LANGUAGE_NAME);
+        showChineseLanguageName.setSelected(isShowChineseLanguageName);
+        showChineseLanguageName.addItemListener(e -> {
+            final int state = e.getStateChange();
+            final boolean isSelected = state == ItemEvent.SELECTED;
+            addLanguageList(mLangList, isSelected);
+            PropertiesComponent.getInstance(project)
+                    .setValue(Constants.KEY_IS_SHOW_CN_LANGUAGE_NAME, isSelected);
+        });
+    }
+
+    private void addLanguageList(List<Lang> supportedLanguages, boolean isShowChinese) {
+        if (supportedLanguages == null || supportedLanguages.isEmpty()) {
+            return;
+        }
         List<String> selectedLanguageIds = LanguageUtil.getSelectedLanguageIds(project);
-        languagesPanel.setLayout(new GridLayout(supportedLanguages.size() / 4, 4));
+        LOG.info("supportedLanguages list:" + supportedLanguages.size());
+        languagesPanel.removeAll();
+        selectedLanguages.clear();
+        int rows = (int) Math.ceil(supportedLanguages.size() / 4.0);
+        languagesPanel.setLayout(new GridLayout(rows, 4));
         for (Lang language : supportedLanguages) {
             String code = language.getCode();
-            JBCheckBox checkBoxLanguage = new JBCheckBox();
-            checkBoxLanguage.setText(language.getEnglishName()
-                    .concat("(").concat(code).concat(")"));
-            languagesPanel.add(checkBoxLanguage);
+            JBCheckBox checkBoxLanguage = new JBCheckBox(
+                    (isShowChinese ? language.getChineseName() : language.getEnglishName())
+                            + "(" + code + ")");
             checkBoxLanguage.addItemListener(e -> {
                 int state = e.getStateChange();
                 if (state == ItemEvent.SELECTED) {
@@ -111,12 +139,16 @@ public class SelectLanguagesDialog extends DialogWrapper {
                     selectedLanguages.remove(language);
                 }
                 // Update the OK button UI
-                getOKAction().setEnabled(selectedLanguages.size() > 0);
+                getOKAction().setEnabled(!selectedLanguages.isEmpty());
             });
-            if (selectedLanguageIds != null && selectedLanguageIds.contains(String.valueOf(language.getId()))) {
+            if (selectedLanguageIds != null &&
+                    selectedLanguageIds.contains(String.valueOf(language.getId()))) {
                 checkBoxLanguage.setSelected(true);
             }
+            languagesPanel.add(checkBoxLanguage);
         }
+        languagesPanel.revalidate();
+        languagesPanel.repaint();
     }
 
     private void initOverwriteExistingStringOption() {
