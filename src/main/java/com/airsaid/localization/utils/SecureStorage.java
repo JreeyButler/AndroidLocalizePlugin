@@ -29,26 +29,26 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SecureStorage {
 
-  private final String key;
+    private final String key;
 
-  public SecureStorage(@NotNull String key) {
-    this.key = key;
-  }
+    public SecureStorage(@NotNull String key) {
+        this.key = key;
+    }
 
-  public void save(@NotNull String text) {
-    CredentialAttributes credentialAttributes = createCredentialAttributes();
-    Credentials credentials = new Credentials(key, text);
-    PasswordSafe.getInstance().set(credentialAttributes, credentials);
-  }
+    public void save(@NotNull String text) {
+        CredentialAttributes credentialAttributes = createCredentialAttributes();
+        Credentials credentials = new Credentials(key, text);
+        PasswordSafe.getInstance().set(credentialAttributes, credentials);
+    }
 
-  @NotNull
-  public String read() {
-    String password = PasswordSafe.getInstance().getPassword(createCredentialAttributes());
-    return password != null ? password : "";
-  }
+    @NotNull
+    public String read() {
+        String password = PasswordSafe.getInstance().getPassword(createCredentialAttributes());
+        return password != null ? password : "";
+    }
 
-  @NotNull
-  private CredentialAttributes createCredentialAttributes() {
-    return new CredentialAttributes(CredentialAttributesKt.generateServiceName(Constants.PLUGIN_NAME, key));
-  }
+    @NotNull
+    private CredentialAttributes createCredentialAttributes() {
+        return new CredentialAttributes(CredentialAttributesKt.generateServiceName(Constants.PLUGIN_NAME, key));
+    }
 }

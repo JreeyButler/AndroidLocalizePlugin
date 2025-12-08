@@ -28,28 +28,28 @@ import java.util.List;
  */
 public class EscapeCharactersInterceptor implements TranslatorService.TranslationInterceptor {
 
-  private final List<Character> needEscapeChars = new ArrayList<>();
+    private final List<Character> needEscapeChars = new ArrayList<>();
 
-  public EscapeCharactersInterceptor() {
-    needEscapeChars.add('@');
-    needEscapeChars.add('?');
-    needEscapeChars.add('\'');
-    needEscapeChars.add('\"');
-  }
+    public EscapeCharactersInterceptor() {
+        needEscapeChars.add('@');
+        needEscapeChars.add('?');
+        needEscapeChars.add('\'');
+        needEscapeChars.add('\"');
+    }
 
-  @Override
-  public String process(String text) {
-    if (StringUtil.isEmpty(text)) {
-      return text;
+    @Override
+    public String process(String text) {
+        if (StringUtil.isEmpty(text)) {
+            return text;
+        }
+        final StringBuilder result = new StringBuilder();
+        final char[] chars = text.toCharArray();
+        for (char ch : chars) {
+            if (needEscapeChars.contains(ch)) {
+                result.append('\\');
+            }
+            result.append(ch);
+        }
+        return result.toString();
     }
-    final StringBuilder result = new StringBuilder();
-    final char[] chars = text.toCharArray();
-    for (char ch : chars) {
-      if (needEscapeChars.contains(ch)) {
-        result.append('\\');
-      }
-      result.append(ch);
-    }
-    return result.toString();
-  }
 }

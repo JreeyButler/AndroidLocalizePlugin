@@ -42,68 +42,69 @@ import java.util.Map;
  * @author airsaid
  */
 @State(
-    name = "com.airsaid.localization.translate.services.TranslationCacheService",
-    storages = {@Storage("androidLocalizeTranslationCaches.xml")}
+        name = "com.airsaid.localization.translate.services.TranslationCacheService",
+        storages = {@Storage("androidLocalizeTranslationCaches.xml")}
 )
 @Service
 public final class TranslationCacheService implements PersistentStateComponent<TranslationCacheService>, Disposable {
 
-  @Transient
-  private static final int CACHE_MAX_SIZE = 500;
+    @Transient
+    private static final int CACHE_MAX_SIZE = 500;
 
-  @OptionTag(converter = LruCacheConverter.class)
-  private final LRUCache<String, String> lruCache = new LRUCache<>(CACHE_MAX_SIZE);
+    @OptionTag(converter = LruCacheConverter.class)
+    private final LRUCache<String, String> lruCache = new LRUCache<>(CACHE_MAX_SIZE);
 
-  public static TranslationCacheService getInstance() {
-    return ServiceManager.getService(TranslationCacheService.class);
-  }
+    public static TranslationCacheService getInstance() {
+        return ServiceManager.getService(TranslationCacheService.class);
+    }
 
-  public void put(@NotNull String key, @NotNull String value) {
-    lruCache.put(key, value);
-  }
+    public void put(@NotNull String key, @NotNull String value) {
+        lruCache.put(key, value);
+    }
 
-  @NotNull
-  public String get(String key) {
-    String value = lruCache.get(key);
-    return value != null ? value : "";
-  }
+    @NotNull
+    public String get(String key) {
+        String value = lruCache.get(key);
+        return value != null ? value : "";
+    }
 
-  public void setMaxCacheSize(int maxCacheSize) {
-    lruCache.setMaxCapacity(maxCacheSize);
-  }
-
-  @Override
-  public @NotNull TranslationCacheService getState() {
-    return this;
-  }
-
-  @Override
-  public void loadState(@NotNull TranslationCacheService state) {
-    XmlSerializerUtil.copyBean(state, this);
-  }
-
-  @Override
-  public void dispose() {
-    lruCache.clear();
-  }
-
-  static class LruCacheConverter extends Converter<LRUCache<String, String>> {
-    @Override
-    public @Nullable LRUCache<String, String> fromString(@NotNull String value) {
-      Type type = new TypeToken<Map<String, String>>() {}.getType();
-      Map<String, String> map = GsonUtil.getInstance().getGson().fromJson(value, type);
-      LRUCache<String, String> lruCache = new LRUCache<>(CACHE_MAX_SIZE);
-      for (Map.Entry<String, String> entry : map.entrySet()) {
-        lruCache.put(entry.getKey(), entry.getValue());
-      }
-      return lruCache;
+    public void setMaxCacheSize(int maxCacheSize) {
+        lruCache.setMaxCapacity(maxCacheSize);
     }
 
     @Override
-    public @Nullable String toString(@NotNull LRUCache<String, String> lruCache) {
-      Map<String, String> values = new LinkedHashMap<>();
-      lruCache.forEach(values::put);
-      return GsonUtil.getInstance().getGson().toJson(values);
+    public @NotNull TranslationCacheService getState() {
+        return this;
     }
-  }
+
+    @Override
+    public void loadState(@NotNull TranslationCacheService state) {
+        XmlSerializerUtil.copyBean(state, this);
+    }
+
+    @Override
+    public void dispose() {
+        lruCache.clear();
+    }
+
+    static class LruCacheConverter extends Converter<LRUCache<String, String>> {
+        @Override
+        public @Nullable LRUCache<String, String> fromString(@NotNull String value) {
+            Type type = new TypeToken<Map<String, String>>() {
+            }.getType();
+            Map<String, String> map = GsonUtil.getInstance().getGson().fromJson(value, type);
+            LRUCache<String, String> lruCache = new LRUCache<>(CACHE_MAX_SIZE);
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                lruCache.put(entry.getKey(), entry.getValue());
+            }
+            return lruCache;
+        }
+
+        @Override
+        public @Nullable String toString(@NotNull LRUCache<String, String> lruCache) {
+            Map<String, String> values = new LinkedHashMap<>();
+            lruCache.forEach(values::put);
+            return GsonUtil.getInstance().getGson().toJson(values);
+        }
+    }
 }

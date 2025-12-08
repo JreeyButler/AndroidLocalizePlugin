@@ -38,145 +38,144 @@ import java.util.function.Consumer;
 @Service
 public final class TranslatorService {
 
-  private static final Logger LOG = Logger.getInstance(TranslatorService.class);
+    private static final Logger LOG = Logger.getInstance(TranslatorService.class);
+    private final AbstractTranslator defaultTranslator;
+    private final TranslationCacheService cacheService;
+    private final Map<String, AbstractTranslator> translators;
+    private final List<TranslationInterceptor> translationInterceptors;
+    private AbstractTranslator selectedTranslator;
+    private boolean isEnableCache = true;
+    private int intervalTime;
 
-  private AbstractTranslator selectedTranslator;
-  private final AbstractTranslator defaultTranslator;
-  private final TranslationCacheService cacheService;
-  private final Map<String, AbstractTranslator> translators;
-  private final List<TranslationInterceptor> translationInterceptors;
-  private boolean isEnableCache = true;
-  private int intervalTime;
+    public TranslatorService() {
+        translators = new LinkedHashMap<>();
+        ServiceLoader<AbstractTranslator> serviceLoader = ServiceLoader.load(
+                AbstractTranslator.class, getClass().getClassLoader()
+        );
+        for (AbstractTranslator translator : serviceLoader) {
+            translators.put(translator.getKey(), translator);
+        }
+        defaultTranslator = translators.get(GoogleTranslator.KEY);
 
-  public interface TranslationInterceptor {
-    String process(String text);
-  }
+        cacheService = TranslationCacheService.getInstance();
 
-  public TranslatorService() {
-    translators = new LinkedHashMap<>();
-    ServiceLoader<AbstractTranslator> serviceLoader = ServiceLoader.load(
-        AbstractTranslator.class, getClass().getClassLoader()
-    );
-    for (AbstractTranslator translator : serviceLoader) {
-      translators.put(translator.getKey(), translator);
-    }
-    defaultTranslator = translators.get(GoogleTranslator.KEY);
-
-    cacheService = TranslationCacheService.getInstance();
-
-    translationInterceptors = new ArrayList<>();
-    translationInterceptors.add(new EscapeCharactersInterceptor());
-  }
-
-  @NotNull
-  public static TranslatorService getInstance() {
-    return ServiceManager.getService(TranslatorService.class);
-  }
-
-  public AbstractTranslator getDefaultTranslator() {
-    return defaultTranslator;
-  }
-
-  public Map<String, AbstractTranslator> getTranslators() {
-    return translators;
-  }
-
-  public void setSelectedTranslator(@NotNull AbstractTranslator selectedTranslator) {
-    if (this.selectedTranslator != selectedTranslator) {
-      LOG.info(String.format("setTranslator: %s", selectedTranslator));
-      this.selectedTranslator = selectedTranslator;
-    }
-  }
-
-  @Nullable
-  public AbstractTranslator getSelectedTranslator() {
-    return selectedTranslator;
-  }
-
-  public void doTranslateByAsync(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text, @NotNull Consumer<String> consumer) {
-    ApplicationManager.getApplication().executeOnPooledThread(() -> {
-      final String translatedText = doTranslate(fromLang, toLang, text);
-      ApplicationManager.getApplication().invokeLater(() ->
-          consumer.accept(translatedText));
-    });
-  }
-
-  public String doTranslate(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
-    LOG.info(String.format("doTranslate fromLang: %s, toLang: %s, text: %s", fromLang, toLang, text));
-
-    if (isEnableCache) {
-      String cacheResult = cacheService.get(getCacheKey(fromLang, toLang, text));
-      if (!cacheResult.isEmpty()) {
-        LOG.info(String.format("doTranslate cache result: %s", cacheResult));
-        return cacheResult;
-      }
+        translationInterceptors = new ArrayList<>();
+        translationInterceptors.add(new EscapeCharactersInterceptor());
     }
 
-    // Arabic numbers skip translation
-    if (StringUtils.isNumeric(text)) {
-      return text;
+    @NotNull
+    public static TranslatorService getInstance() {
+        return ServiceManager.getService(TranslatorService.class);
     }
-    text = getValidContent(text);
 
-    String result = selectedTranslator.doTranslate(fromLang, toLang, text);
-    LOG.info(String.format("doTranslate result: %s", result));
-    for (TranslationInterceptor interceptor : translationInterceptors) {
-      result = interceptor.process(result);
-      LOG.info(String.format("doTranslate interceptor process result: %s", result));
+    public AbstractTranslator getDefaultTranslator() {
+        return defaultTranslator;
     }
-    cacheService.put(getCacheKey(fromLang, toLang, text), result);
-    delay(intervalTime);
-    return result;
-  }
 
-  /**
-   * Remove double quotes from the beginning and end of text sentences
-   *
-   * @param text source text
-   * @return valid text
-   */
-  private String getValidContent(String text) {
-    if (text == null || "".equals(text)) {
-      return text;
+    public Map<String, AbstractTranslator> getTranslators() {
+        return translators;
     }
-    final int index = text.indexOf("\"");
-    if (index == 0) {
-      text = text.substring(1, text.length());
+
+    @Nullable
+    public AbstractTranslator getSelectedTranslator() {
+        return selectedTranslator;
     }
-    final int lastIndex = text.lastIndexOf("\"");
-    if (lastIndex != -1 && lastIndex == text.length() - 1) {
-      text = text.substring(0, lastIndex);
+
+    public void setSelectedTranslator(@NotNull AbstractTranslator selectedTranslator) {
+        if (this.selectedTranslator != selectedTranslator) {
+            LOG.info(String.format("setTranslator: %s", selectedTranslator));
+            this.selectedTranslator = selectedTranslator;
+        }
     }
-    return text;
-  }
 
-  public void setEnableCache(boolean isEnableCache) {
-    this.isEnableCache = isEnableCache;
-  }
-
-  public boolean isEnableCache() {
-    return isEnableCache;
-  }
-
-  public void setMaxCacheSize(int maxCacheSize) {
-    cacheService.setMaxCacheSize(maxCacheSize);
-  }
-
-  public void setTranslationInterval(int intervalTime) {
-    this.intervalTime = intervalTime;
-  }
-
-  private String getCacheKey(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
-    return fromLang.getCode() + "_" + toLang.getCode() + "_" + text;
-  }
-
-  private void delay(int second) {
-    if (second <= 0) return;
-    try {
-      LOG.info(String.format("doTranslate delay time: %d second.", second));
-      Thread.sleep(second * 1000L);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    public void doTranslateByAsync(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text, @NotNull Consumer<String> consumer) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final String translatedText = doTranslate(fromLang, toLang, text);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    consumer.accept(translatedText));
+        });
     }
-  }
+
+    public String doTranslate(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
+        LOG.info(String.format("doTranslate fromLang: %s, toLang: %s, text: %s", fromLang, toLang, text));
+
+        if (isEnableCache) {
+            String cacheResult = cacheService.get(getCacheKey(fromLang, toLang, text));
+            if (!cacheResult.isEmpty()) {
+                LOG.info(String.format("doTranslate cache result: %s", cacheResult));
+                return cacheResult;
+            }
+        }
+
+        // Arabic numbers skip translation
+        if (StringUtils.isNumeric(text)) {
+            return text;
+        }
+        text = getValidContent(text);
+
+        String result = selectedTranslator.doTranslate(fromLang, toLang, text);
+        LOG.info(String.format("doTranslate result: %s", result));
+        for (TranslationInterceptor interceptor : translationInterceptors) {
+            result = interceptor.process(result);
+            LOG.info(String.format("doTranslate interceptor process result: %s", result));
+        }
+        cacheService.put(getCacheKey(fromLang, toLang, text), result);
+        delay(intervalTime);
+        return result;
+    }
+
+    /**
+     * Remove double quotes from the beginning and end of text sentences
+     *
+     * @param text source text
+     * @return valid text
+     */
+    private String getValidContent(String text) {
+        if (text == null || "".equals(text)) {
+            return text;
+        }
+        final int index = text.indexOf("\"");
+        if (index == 0) {
+            text = text.substring(1);
+        }
+        final int lastIndex = text.lastIndexOf("\"");
+        if (lastIndex != -1 && lastIndex == text.length() - 1) {
+            text = text.substring(0, lastIndex);
+        }
+        return text;
+    }
+
+    public boolean isEnableCache() {
+        return isEnableCache;
+    }
+
+    public void setEnableCache(boolean isEnableCache) {
+        this.isEnableCache = isEnableCache;
+    }
+
+    public void setMaxCacheSize(int maxCacheSize) {
+        cacheService.setMaxCacheSize(maxCacheSize);
+    }
+
+    public void setTranslationInterval(int intervalTime) {
+        this.intervalTime = intervalTime;
+    }
+
+    private String getCacheKey(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
+        return fromLang.getCode() + "_" + toLang.getCode() + "_" + text;
+    }
+
+    private void delay(int second) {
+        if (second <= 0) return;
+        try {
+            LOG.info(String.format("doTranslate delay time: %d second.", second));
+            Thread.sleep(second * 1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public interface TranslationInterceptor {
+        String process(String text);
+    }
 }

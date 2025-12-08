@@ -29,32 +29,32 @@ import java.util.List;
  */
 public interface TranslatorConfigurable {
 
-  @NotNull
-  String getKey();
+    @NotNull
+    String getKey();
 
-  @NotNull
-  String getName();
+    @NotNull
+    String getName();
 
-  @Nullable
-  Icon getIcon();
+    @Nullable
+    Icon getIcon();
 
-  @NotNull
-  List<Lang> getSupportedLanguages();
+    @NotNull
+    List<Lang> getSupportedLanguages();
 
-  boolean isNeedAppId();
+    boolean isNeedAppId();
 
-  @Nullable
-  String getAppId();
+    @Nullable
+    String getAppId();
 
-  String getAppIdDisplay();
+    String getAppIdDisplay();
 
-  boolean isNeedAppKey();
+    boolean isNeedAppKey();
 
-  @Nullable
-  String getAppKey();
+    @Nullable
+    String getAppKey();
 
-  String getAppKeyDisplay();
+    String getAppKeyDisplay();
 
-  @Nullable
-  String getApplyAppIdUrl();
+    @Nullable
+    String getApplyAppIdUrl();
 }

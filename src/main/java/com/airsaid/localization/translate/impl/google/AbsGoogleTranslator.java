@@ -32,36 +32,36 @@ import java.util.List;
  */
 public abstract class AbsGoogleTranslator extends AbstractTranslator {
 
-  protected List<Lang> supportedLanguages;
+    protected List<Lang> supportedLanguages;
 
-  @Override
-  public @NotNull Icon getIcon() {
-    return PluginIcons.GOOGLE_ICON;
-  }
-
-  @Override
-  @NotNull
-  public List<Lang> getSupportedLanguages() {
-    if (supportedLanguages == null) {
-      List<Lang> languages = Languages.getLanguages();
-      supportedLanguages = new ArrayList<>(105);
-      for (int i = 1; i <= 104; i++) {
-        Lang lang = languages.get(i);
-        if (lang.equals(Languages.CHINESE_SIMPLIFIED)) {
-          lang = lang.setTranslationCode("zh-CN");
-        } else if (lang.equals(Languages.CHINESE_TRADITIONAL)) {
-          lang = lang.setTranslationCode("zh-TW");
-        } else if (lang.equals(Languages.FILIPINO)) {
-          lang = lang.setTranslationCode("tl");
-        } else if (lang.equals(Languages.INDONESIAN)) {
-          lang = lang.setTranslationCode("id");
-        } else if (lang.equals(Languages.JAVANESE)) {
-          lang = lang.setTranslationCode("jw");
-        }
-        supportedLanguages.add(lang);
-      }
-      supportedLanguages.add(Languages.SORANI_KURDISH);
+    @Override
+    public @NotNull Icon getIcon() {
+        return PluginIcons.GOOGLE_ICON;
     }
-    return supportedLanguages;
-  }
+
+    @Override
+    @NotNull
+    public List<Lang> getSupportedLanguages() {
+        if (supportedLanguages == null) {
+            List<Lang> languages = Languages.getLanguages();
+            supportedLanguages = new ArrayList<>(105);
+            for (int i = 1; i <= 104; i++) {
+                Lang lang = languages.get(i);
+                if (lang.equals(Languages.CHINESE_SIMPLIFIED)) {
+                    lang = lang.setTranslationCode("zh-CN");
+                } else if (lang.equals(Languages.CHINESE_TRADITIONAL)) {
+                    lang = lang.setTranslationCode("zh-TW");
+                } else if (lang.equals(Languages.FILIPINO)) {
+                    lang = lang.setTranslationCode("tl");
+                } else if (lang.equals(Languages.INDONESIAN)) {
+                    lang = lang.setTranslationCode("id");
+                } else if (lang.equals(Languages.JAVANESE)) {
+                    lang = lang.setTranslationCode("jw");
+                }
+                supportedLanguages.add(lang);
+            }
+            supportedLanguages.add(Languages.SORANI_KURDISH);
+        }
+        return supportedLanguages;
+    }
 }

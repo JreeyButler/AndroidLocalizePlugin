@@ -31,15 +31,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Translator {
 
-  /**
-   * Invoke translation operation.
-   *
-   * @param fromLang the language of text.
-   * @param toLang   the language to be translated into.
-   * @param text     the text to be translated.
-   * @return the translated text.
-   * @throws TranslationException this exception is thrown if the translation failed.
-   */
-  String doTranslate(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) throws TranslationException;
+    /**
+     * Invoke translation operation.
+     *
+     * @param fromLang the language of text.
+     * @param toLang   the language to be translated into.
+     * @param text     the text to be translated.
+     * @return the translated text.
+     * @throws TranslationException this exception is thrown if the translation failed.
+     */
+    String doTranslate(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) throws TranslationException;
 
 }

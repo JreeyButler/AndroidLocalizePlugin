@@ -25,22 +25,22 @@ import com.google.gson.GsonBuilder;
  */
 public class GsonUtil {
 
-  private final Gson gson;
+    private final Gson gson;
 
-  public GsonUtil() {
-    gson = new GsonBuilder().create();
-  }
+    public GsonUtil() {
+        gson = new GsonBuilder().create();
+    }
 
-  public static GsonUtil getInstance() {
-    return GsonUtilHolder.sInstance;
-  }
+    public static GsonUtil getInstance() {
+        return GsonUtilHolder.sInstance;
+    }
 
-  public Gson getGson() {
-    return gson;
-  }
+    public Gson getGson() {
+        return gson;
+    }
 
-  private static class GsonUtilHolder {
-    private static final GsonUtil sInstance = new GsonUtil();
-  }
+    private static class GsonUtilHolder {
+        private static final GsonUtil sInstance = new GsonUtil();
+    }
 
 }

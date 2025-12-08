@@ -28,12 +28,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface TranslationResult {
 
-  /**
-   * Get a translation result of the specified text.
-   *
-   * @return translation result text.
-   */
-  @NotNull
-  String getTranslationResult();
+    /**
+     * Get a translation result of the specified text.
+     *
+     * @return translation result text.
+     */
+    @NotNull
+    String getTranslationResult();
 
 }

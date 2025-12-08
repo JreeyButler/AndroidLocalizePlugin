@@ -28,22 +28,22 @@ import org.jetbrains.annotations.NotNull;
 @AutoService(AbstractTranslator.class)
 public class DeepLProTranslator extends DeepLTranslator {
 
-  private static final String KEY = "DeepLPro";
-  private static final String HOST_URL = "https://api.deepl.com/v2";
-  private static final String TRANSLATE_URL = HOST_URL.concat("/translate");
+    private static final String KEY = "DeepLPro";
+    private static final String HOST_URL = "https://api.deepl.com/v2";
+    private static final String TRANSLATE_URL = HOST_URL.concat("/translate");
 
-  @Override
-  public @NotNull String getKey() {
-    return KEY;
-  }
+    @Override
+    public @NotNull String getKey() {
+        return KEY;
+    }
 
-  @Override
-  public @NotNull String getName() {
-    return KEY;
-  }
+    @Override
+    public @NotNull String getName() {
+        return KEY;
+    }
 
-  @Override
-  public @NotNull String getRequestUrl(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
-    return TRANSLATE_URL;
-  }
+    @Override
+    public @NotNull String getRequestUrl(@NotNull Lang fromLang, @NotNull Lang toLang, @NotNull String text) {
+        return TRANSLATE_URL;
+    }
 }

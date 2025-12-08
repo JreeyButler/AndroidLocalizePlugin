@@ -86,6 +86,7 @@ public class SelectLanguagesDialog extends DialogWrapper {
         // add languages
         selectedLanguages.clear();
         List<Lang> supportedLanguages = Objects.requireNonNull(TranslatorService.getInstance().getSelectedTranslator()).getSupportedLanguages();
+
         final boolean isSortByLanguageCode = PropertiesComponent.getInstance(project)
                 .getBoolean(Constants.KEY_IS_SORT_BY_LANGUAGE_CODE);
         supportedLanguages.sort(isSortByLanguageCode ?
