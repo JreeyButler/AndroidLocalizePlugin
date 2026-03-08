@@ -2,10 +2,10 @@ package com.airsaid.localization.translate.impl.bytedance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 
@@ -16,20 +16,13 @@ import com.airsaid.localization.translate.AbstractTranslator;
 import com.airsaid.localization.translate.TranslationException;
 import com.airsaid.localization.translate.lang.Lang;
 import com.airsaid.localization.translate.lang.Languages;
-import com.airsaid.localization.translate.util.GsonUtil;
-import com.esotericsoftware.minlog.Log;
 import com.google.auto.service.AutoService;
-import com.intellij.lang.Language;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.updateSettings.impl.pluginsAdvertisement.PluginsAdvertiser.Plugin;
-import com.intellij.util.io.RequestBuilder;
 import com.volcengine.service.translate.ITranslateService;
 import com.volcengine.service.translate.impl.TranslateServiceImpl;
 import com.volcengine.model.request.translate.TranslateTextRequest;
 import com.volcengine.model.response.translate.TranslateTextResponse;
 import com.volcengine.model.response.translate.TranslateTextResponse.Translation;
 import com.volcengine.model.response.ResponseMetadata;
-import com.volcengine.model.response.ResponseMetadata.Error;
 
 import icons.PluginIcons;
 
@@ -37,7 +30,6 @@ import icons.PluginIcons;
 
 @AutoService(AbstractTranslator.class)
 public class ByteDanceTranslator extends AbstractTranslator {
-    private static final Logger LOG = Logger.getInstance(ByteDanceTranslator.class);
     private static final String KEY = "ByteDance";
 
     private static final String APPLY_APP_ID_URL = "https://www.volcengine.com/docs/4640/130872";
@@ -87,36 +79,25 @@ public class ByteDanceTranslator extends AbstractTranslator {
     @Override
     public @NotNull List<Lang> getSupportedLanguages() {
         if (supportedLanguages == null) {
-            Set<Lang> langSet = new HashSet<>();
-            List<Lang> allSuportedLangedList = Languages.getLanguages();
-            for (String code : SOURCE_SUPPORT_LANG_CODE_ARRAY) {
-                Lang lang = getLanguageByCode(code,allSuportedLangedList);
-                if (lang != null) {
-                    langSet.add(lang);
-                }
-            }
+            // 创建语言代码到 Lang 对象的映射，提高查找效率
+            Map<String, Lang> langCodeMap = Languages.getLanguages().stream()
+                    .collect(Collectors.toMap(Lang::getCode, lang -> lang));
+
+            // 处理支持的语言
+            Set<Lang> langSet = Arrays.stream(SOURCE_SUPPORT_LANG_CODE_ARRAY)
+                    .map(langCodeMap::get)
+                    .filter(lang -> lang != null)
+                    .collect(Collectors.toSet());
+
+            // 处理需要特殊设置翻译代码的语言
             langSet.add(Languages.CHINESE_SIMPLIFIED.setTranslationCode("zh"));
             langSet.add(Languages.CHINESE_TRADITIONAL.setTranslationCode("zh-Hant"));
             langSet.add(Languages.INDONESIAN.setTranslationCode("id"));
             langSet.add(Languages.HEBREW.setTranslationCode("he"));
+
             supportedLanguages = new ArrayList<>(langSet);
         }
         return supportedLanguages;
-    }
-
-    private Lang getLanguageByCode(String code, List<Lang> list) {
-        if (code == null || "".equals(code)) {
-            return null;
-        }
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        for (Lang lang : list) {
-            if (lang.getCode().equals(code)) {
-                return lang;
-            }
-        }
-        return null;
     }
 
     @Override
